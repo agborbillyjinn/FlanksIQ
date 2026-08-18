@@ -58,7 +58,7 @@ export default function UKTerritory() {
         <AnalyseAccountButton />
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+      <div id="territory-scores" className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8 scroll-mt-32">
         <KpiCard label="Total Accounts" value={loading ? "—" : kpis.total} sublabel="UK ICP universe" />
         <KpiCard label="ICP Qualified" value={loading ? "—" : kpis.icp} sublabel="Segment-matched" accent="text-slate-900" />
         <KpiCard label="High Fit" value={loading ? "—" : kpis.highFit} sublabel="Flanks Fit > 80" accent="text-emerald-600" />

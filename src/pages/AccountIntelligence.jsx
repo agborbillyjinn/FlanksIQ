@@ -3,15 +3,18 @@ import { useParams, Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import AccountHeader from "@/components/intel/AccountHeader";
 import SectionTitle from "@/components/intel/SectionTitle";
+import SectionNav from "@/components/intel/SectionNav";
 import SignalCard from "@/components/intel/SignalCard";
 import PainHypothesisCard from "@/components/intel/PainHypothesisCard";
 import RouteCard from "@/components/intel/RouteCard";
 import CommitteeCard from "@/components/intel/CommitteeCard";
 import SolutionJourney from "@/components/intel/SolutionJourney";
 import AccountStrategyPanel from "@/components/intel/AccountStrategyPanel";
+import MeddpiccPanel from "@/components/intel/MeddpiccPanel";
+import PresentStartModal from "@/components/intel/PresentStartModal";
 import ScoreBreakdown from "@/components/intel/ScoreBreakdown";
 import EvidenceBadge from "@/components/intel/EvidenceBadge";
-import { ArrowLeft, Sparkles, Loader2, RefreshCw } from "lucide-react";
+import { ArrowLeft, Sparkles, Loader2 } from "lucide-react";
 
 function OverviewField({ label, value }) {
   return (
@@ -51,6 +54,7 @@ export default function AccountIntelligence() {
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [presentOpen, setPresentOpen] = useState(false);
   const [error, setError] = useState(null);
 
   const loadAll = async (accId) => {
@@ -133,21 +137,23 @@ export default function AccountIntelligence() {
 
   return (
     <div className="px-8 py-8 max-w-[1200px] mx-auto pb-24">
-      <div className="flex items-center justify-between mb-4">
+      <div className="mb-4">
         <Link to="/" className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-700">
           <ArrowLeft className="h-3.5 w-3.5" /> UK Territory
         </Link>
-        <button
-          onClick={handleRefresh}
-          disabled={refreshing}
-          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-700 text-xs hover:border-slate-300 disabled:opacity-60 transition-colors"
-        >
-          {refreshing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
-          {refreshing ? "Refreshing…" : "Refresh Intelligence"}
-        </button>
       </div>
 
-      <AccountHeader account={account} />
+      <div id="account-header" className="scroll-mt-32">
+        <AccountHeader
+          account={account}
+          strategy={strategy}
+          onRefresh={handleRefresh}
+          onGenerate={handleGenerate}
+          onPresent={() => setPresentOpen(true)}
+          refreshing={refreshing}
+          generating={generating}
+        />
+      </div>
 
       {live && account.scoreBreakdown && (
         <div className="mt-4">
@@ -155,8 +161,12 @@ export default function AccountIntelligence() {
         </div>
       )}
 
-      {/* Section 1 — Account Overview */}
-      <section className="mt-8">
+      <div className="mt-4">
+        <SectionNav />
+      </div>
+
+      {/* 01 — Account Overview */}
+      <section id="overview" className="mt-8 scroll-mt-32">
         <SectionTitle index="01" title="Account Overview" />
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
           <div className="flex items-center gap-2 mb-4">
@@ -180,8 +190,8 @@ export default function AccountIntelligence() {
         </div>
       </section>
 
-      {/* Section 2 — Why Now */}
-      <section className="mt-8">
+      {/* 02 — Why Now */}
+      <section id="why-now" className="mt-8 scroll-mt-32">
         <SectionTitle index="02" title="Why Now" subtitle="Evidence-backed signals that may create a reason to engage." />
         {signals.length ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -190,13 +200,13 @@ export default function AccountIntelligence() {
         ) : (
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-8 text-center">
             <p className="text-sm text-slate-500">No signals captured yet.</p>
-            <p className="mt-1 text-xs text-slate-400">Run "Refresh Intelligence" to research this account, or add signals manually.</p>
+            <p className="mt-1 text-xs text-slate-400">Run "Refresh Research" to research this account, or add signals manually.</p>
           </div>
         )}
       </section>
 
-      {/* Section 3 — Opportunity Thesis */}
-      <section className="mt-8">
+      {/* 03/04 — Hypotheses (Thesis + Pain Hypotheses) */}
+      <section id="hypotheses" className="mt-8 scroll-mt-32">
         <SectionTitle index="03" title="Opportunity Thesis" />
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-5">
           <div className="flex items-center gap-2">
@@ -206,7 +216,7 @@ export default function AccountIntelligence() {
           <p className="text-sm text-slate-700 leading-relaxed">{thesis}</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-slate-100">
             <div>
-              <div className="flex items-center gap-2 mb-2"><EvidenceBadge type="FACT" /><span className="text-xs font-medium text-slate-600">What We Know</span></div>
+              <div className="flex items-center gap-2 mb-2"><EvidenceBadge type="VERIFIED_FACT" /><span className="text-xs font-medium text-slate-600">What We Know</span></div>
               <ul className="space-y-1.5 text-sm text-slate-600">
                 <li>• {account.segment} based in {account.headquarters || "the UK"}.</li>
                 <li>• {account.employeeCount ? `${account.employeeCount.toLocaleString()} employees` : "Employee count not established"}.</li>
@@ -225,25 +235,24 @@ export default function AccountIntelligence() {
             </div>
           </div>
         </div>
+
+        <div className="mt-8">
+          <SectionTitle index="04" title="Pain Hypotheses" subtitle="Likely pains to explore — every item is a hypothesis requiring validation." />
+          {pains.length ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {pains.map((p) => <PainHypothesisCard key={p.id} hypothesis={p} />)}
+            </div>
+          ) : (
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-8 text-center">
+              <p className="text-sm text-slate-500">No pain hypotheses recorded yet.</p>
+              <p className="mt-1 text-xs text-slate-400">Generate an account strategy to surface likely pains to validate.</p>
+            </div>
+          )}
+        </div>
       </section>
 
-      {/* Section 4 — Pain Hypotheses */}
-      <section className="mt-8">
-        <SectionTitle index="04" title="Pain Hypotheses" subtitle="Likely pains to explore — every item is a hypothesis requiring validation." />
-        {pains.length ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {pains.map((p) => <PainHypothesisCard key={p.id} hypothesis={p} />)}
-          </div>
-        ) : (
-          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-8 text-center">
-            <p className="text-sm text-slate-500">No pain hypotheses recorded yet.</p>
-            <p className="mt-1 text-xs text-slate-400">Generate an account strategy to surface likely pains to validate.</p>
-          </div>
-        )}
-      </section>
-
-      {/* Section 5 — Flanks Solution Mapping */}
-      <section className="mt-8">
+      {/* 05 — Flanks Solution Mapping */}
+      <section id="solution" className="mt-8 scroll-mt-32">
         <SectionTitle index="05" title="Flanks Solution Mapping" subtitle="The likely Flanks proposition to test through discovery." />
         <SolutionJourney
           wedge={strategy?.flanksWedge}
@@ -252,8 +261,8 @@ export default function AccountIntelligence() {
         />
       </section>
 
-      {/* Section 6 — Buying Committee */}
-      <section className="mt-8">
+      {/* 06 — Buying Committee */}
+      <section id="buyers" className="mt-8 scroll-mt-32">
         <SectionTitle index="06" title="Buying Committee" subtitle="Where a person is not yet identified, the likely persona is shown." />
         {committee.length ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -267,8 +276,8 @@ export default function AccountIntelligence() {
         )}
       </section>
 
-      {/* Section 7 — Routes Into Account */}
-      <section className="mt-8">
+      {/* 07 — Routes Into Account */}
+      <section id="routes" className="mt-8 scroll-mt-32">
         <SectionTitle index="07" title="Routes Into Account" />
         {routes.length ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -282,9 +291,9 @@ export default function AccountIntelligence() {
         )}
       </section>
 
-      {/* Section 8 — Generate Account Strategy */}
-      <section className="mt-8">
-        <SectionTitle index="08" title="Account Strategy" subtitle="AI-generated thesis, outreach and MEDDPICC — built from the account's researched evidence." />
+      {/* 08 — Account Strategy */}
+      <section id="strategy" className="mt-8 scroll-mt-32">
+        <SectionTitle index="08" title="Account Strategy" subtitle="AI-generated thesis, discovery questions and outreach — built from the account's researched evidence." />
         {!strategy && (
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-8 text-center">
             <div className="mx-auto h-12 w-12 rounded-xl bg-slate-900 flex items-center justify-center mb-4">
@@ -306,20 +315,20 @@ export default function AccountIntelligence() {
           </div>
         )}
         {strategy && <AccountStrategyPanel strategy={strategy} />}
-        {strategy && (
-          <button
-            onClick={handleGenerate}
-            disabled={generating}
-            className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 bg-white text-slate-700 text-sm hover:border-slate-300 disabled:opacity-60 transition-colors"
-          >
-            {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-            {generating ? "Regenerating…" : "Regenerate Strategy"}
-          </button>
-        )}
       </section>
 
+      {/* 09 — MEDDPICC */}
+      {strategy && (
+        <section id="meddpicc" className="mt-8 scroll-mt-32">
+          <SectionTitle index="09" title="MEDDPICC" subtitle="Initial MEDDPICC view — Known, Hypothesised and Unknown." />
+          <MeddpiccPanel strategy={strategy} />
+        </section>
+      )}
+
+      <PresentStartModal open={presentOpen} onClose={() => setPresentOpen(false)} accountId={id} />
+
       {/* Persistent evidence principle */}
-      <div className="fixed bottom-4 right-6 z-30 pointer-events-none">
+      <div className="fixed bottom-4 left-72 z-30 pointer-events-none">
         <div className="px-3.5 py-1.5 rounded-full bg-slate-900/90 text-slate-200 text-[11px] tracking-wide shadow-lg">
           AI proposes. Evidence proves. Sales validates.
         </div>

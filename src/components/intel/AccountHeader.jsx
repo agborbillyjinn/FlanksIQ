@@ -1,8 +1,8 @@
 import React from "react";
 import ScoreCard from "@/components/intel/ScoreCard";
-import { ExternalLink, MapPin } from "lucide-react";
+import { ExternalLink, MapPin, RefreshCw, Sparkles, Loader2, Play } from "lucide-react";
 
-export default function AccountHeader({ account }) {
+export default function AccountHeader({ account, onRefresh, onGenerate, onPresent, refreshing, generating, strategy }) {
   const live = account.dataSource === "live";
   return (
     <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
@@ -48,6 +48,30 @@ export default function AccountHeader({ account }) {
       <p className="mt-3 text-xs text-slate-400 max-w-2xl">
         Priority combines structural fit, timing, route-to-account and evidence confidence to help focus AE attention. This is a sales prioritisation framework, not a scientifically validated model.
       </p>
+      <div className="mt-5 flex items-center gap-2 flex-wrap">
+        <button
+          onClick={onRefresh}
+          disabled={refreshing}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 text-xs hover:border-slate-300 hover:text-slate-900 disabled:opacity-60 transition-colors"
+        >
+          {refreshing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
+          {refreshing ? "Refreshing…" : "Refresh Research"}
+        </button>
+        <button
+          onClick={onGenerate}
+          disabled={generating}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 text-xs hover:border-slate-300 hover:text-slate-900 disabled:opacity-60 transition-colors"
+        >
+          {generating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+          {generating ? "Generating…" : strategy ? "Regenerate Strategy" : "Generate Strategy"}
+        </button>
+        <button
+          onClick={onPresent}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs hover:bg-slate-800 transition-colors ml-auto"
+        >
+          <Play className="h-3.5 w-3.5" /> Present
+        </button>
+      </div>
     </div>
   );
 }

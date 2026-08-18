@@ -90,3 +90,11 @@
     @apply bg-background text-foreground font-body;
   }
 }
+
+@layer utilities {
+  .demo-highlight {
+    border-radius: 0.75rem;
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.7);
+    transition: box-shadow 0.3s ease;
+  }
+}
