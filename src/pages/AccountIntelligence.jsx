@@ -11,6 +11,8 @@ import CommitteeCard from "@/components/intel/CommitteeCard";
 import SolutionJourney from "@/components/intel/SolutionJourney";
 import AccountStrategyPanel from "@/components/intel/AccountStrategyPanel";
 import MeddpiccPanel from "@/components/intel/MeddpiccPanel";
+import EcosystemOpportunityCard from "@/components/intel/EcosystemOpportunityCard";
+import MultiplierAssessmentCard from "@/components/intel/MultiplierAssessmentCard";
 import PresentStartModal from "@/components/intel/PresentStartModal";
 import ScoreBreakdown from "@/components/intel/ScoreBreakdown";
 import EvidenceBadge from "@/components/intel/EvidenceBadge";
@@ -162,7 +164,7 @@ export default function AccountIntelligence() {
       )}
 
       <div className="mt-4">
-        <SectionNav />
+        <SectionNav showEcosystem={account.gtmMotion && account.gtmMotion !== "Direct"} />
       </div>
 
       {/* 01 — Account Overview */}
@@ -189,6 +191,16 @@ export default function AccountIntelligence() {
           </div>
         </div>
       </section>
+
+      {account.gtmMotion && account.gtmMotion !== "Direct" && (
+        <section id="ecosystem" className="mt-8 scroll-mt-32">
+          <SectionTitle title="Ecosystem Opportunity" subtitle="Distribution value — one platform or partner could create access to many institutions." />
+          <div className="space-y-4">
+            <MultiplierAssessmentCard account={account} />
+            <EcosystemOpportunityCard account={account} />
+          </div>
+        </section>
+      )}
 
       {/* 02 — Why Now */}
       <section id="why-now" className="mt-8 scroll-mt-32">

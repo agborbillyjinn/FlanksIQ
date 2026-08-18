@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from "react";
 
-const items = [
-  { id: "overview", label: "Overview" },
-  { id: "why-now", label: "Why Now" },
-  { id: "hypotheses", label: "Hypotheses" },
-  { id: "solution", label: "Solution" },
-  { id: "buyers", label: "Buyers" },
-  { id: "routes", label: "Routes" },
-  { id: "strategy", label: "Strategy" },
-  { id: "meddpicc", label: "MEDDPICC" },
-];
-
-export default function SectionNav() {
+export default function SectionNav({ showEcosystem = false }) {
+  const items = [
+    { id: "overview", label: "Overview" },
+    ...(showEcosystem ? [{ id: "ecosystem", label: "Ecosystem" }] : []),
+    { id: "why-now", label: "Why Now" },
+    { id: "hypotheses", label: "Hypotheses" },
+    { id: "solution", label: "Solution" },
+    { id: "buyers", label: "Buyers" },
+    { id: "routes", label: "Routes" },
+    { id: "strategy", label: "Strategy" },
+    { id: "meddpicc", label: "MEDDPICC" },
+  ];
   const [active, setActive] = useState("overview");
 
   useEffect(() => {

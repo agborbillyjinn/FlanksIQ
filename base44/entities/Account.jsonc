@@ -114,6 +114,33 @@
     },
     "scoreBreakdown": {
       "type": "object"
+    },
+    "gtmMotion": {
+      "type": "string",
+      "enum": [
+        "Direct",
+        "Embedded",
+        "Ecosystem",
+        "Partner"
+      ]
+    },
+    "multiplierPotential": {
+      "type": "number"
+    },
+    "multiplierAssessment": {
+      "type": "object"
+    },
+    "ecosystemOpportunity": {
+      "type": "object"
+    },
+    "ecosystemRelationshipType": {
+      "type": "string",
+      "enum": [
+        "COMPLEMENT",
+        "OVERLAP",
+        "COMPETITOR",
+        "UNKNOWN"
+      ]
     }
   },
   "required": [

@@ -24,7 +24,7 @@ const segments = [
   "AI-Native Financial Services",
 ];
 
-export default function FilterBar({ segment, setSegment, toggles, toggle }) {
+export default function FilterBar({ segment, setSegment, toggles, toggle, gtmMotion, setGtmMotion }) {
   return (
     <div className="flex flex-wrap items-center gap-2">
       <div className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 mr-1">
@@ -38,6 +38,18 @@ export default function FilterBar({ segment, setSegment, toggles, toggle }) {
         >
           {segments.map((s) => (
             <option key={s} value={s}>{s}</option>
+          ))}
+        </select>
+        <ChevronDown className="h-3.5 w-3.5 absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+      </div>
+      <div className="relative">
+        <select
+          value={gtmMotion}
+          onChange={(e) => setGtmMotion(e.target.value)}
+          className="appearance-none text-xs bg-white border border-slate-200 rounded-lg pl-3 pr-8 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-200"
+        >
+          {["All", "Direct", "Embedded", "Ecosystem", "Partner"].map((g) => (
+            <option key={g} value={g}>{g === "All" ? "All Motions" : g}</option>
           ))}
         </select>
         <ChevronDown className="h-3.5 w-3.5 absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />

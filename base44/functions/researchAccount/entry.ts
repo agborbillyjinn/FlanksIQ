@@ -132,6 +132,37 @@ const responseSchema = {
         partnerRoute: scoringLevel,
         eventRoute: scoringLevel
       }
+    },
+    ecosystemAnalysis: {
+      type: "object",
+      properties: {
+        relationshipType: { type: "string", enum: ["COMPLEMENT", "OVERLAP", "COMPETITOR", "UNKNOWN"] },
+        multiplierInputs: {
+          type: "object",
+          properties: {
+            icpCustomerOverlap: scoringLevel,
+            workflowOwnership: scoringLevel,
+            dataDependency: scoringLevel,
+            embeddingPotential: scoringLevel,
+            distributionLeverage: scoringLevel,
+            strategicEcosystemValue: scoringLevel
+          }
+        },
+        ecosystemOpportunity: {
+          type: "object",
+          properties: {
+            whyMatter: { type: "string" },
+            capability: { type: "string" },
+            ownedWorkflow: { type: "string" },
+            downstreamIcp: { type: "string" },
+            distributionLeverage: { type: "string" },
+            evidence: { type: "string" },
+            needsValidating: { type: "string" },
+            commercialMotion: { type: "string", enum: ["Direct sale", "API / Embedded", "Co-sell", "Referral", "Technology integration", "Strategic partnership"] },
+            aiWealthtechThesis: { type: "string" }
+          }
+        }
+      }
     }
   },
   required: ["companyProfile", "signals", "executives", "painHypotheses", "relationshipRoutes", "scoringInputs"]
@@ -154,7 +185,45 @@ export default async function(req) {
     const body = await req.json();
     const name = body && body.name && body.name.trim();
     const domain = body && body.domain && body.domain.trim();
+    const gtmMotionRaw = body && body.gtmMotion;
+    const gtmMotion = ["Direct", "Embedded", "Ecosystem", "Partner"].includes(gtmMotionRaw) ? gtmMotionRaw : "Direct";
     if (!name || !domain) return Response.json({ error: 'name and domain are required' }, { status: 400 });
+
+    const ecosystemBlock = gtmMotion !== "Direct" ? `
+GTM MOTION — this account is being analysed as a ${gtmMotion.toUpperCase()} opportunity, NOT a direct wealth-management end customer.
+- Direct: traditional end customer (wealth manager, private bank, family office, asset manager)
+- Embedded: technology company that could embed Flanks APIs/data infrastructure into its own product
+- Ecosystem: technology provider whose installed base or customer relationships could create distribution / co-sell opportunities
+- Partner: organisation that could influence or introduce Flanks into target institutions
+
+In addition to the standard research, research these ecosystem questions:
+- Who are its customers? Does it serve wealth-management organisations (wealth managers, private banks, family offices, advisers)?
+- What workflows does its technology own (adviser, client, portfolio, data, reporting workflows)?
+- Does it have APIs? A partner ecosystem? Integrations with financial institutions?
+- Does it already aggregate financial data?
+- Would Flanks complement or compete with its existing capabilities?
+- Could Flanks reduce connectivity / integration development for it?
+- Is there evidence of AI functionality requiring financial context?
+- What is the plausible downstream distribution opportunity?
+
+CRITICAL — do not assume every technology company is a Flanks opportunity. Classify the relationship as exactly one of:
+- COMPLEMENT — Flanks could strengthen the platform
+- OVERLAP — some capabilities may overlap
+- COMPETITOR — the organisation may already provide competing aggregation infrastructure
+- UNKNOWN — insufficient evidence
+Never recommend a partnership merely because an organisation is a technology company.
+
+Return ecosystemAnalysis with:
+- relationshipType: one of COMPLEMENT / OVERLAP / COMPETITOR / UNKNOWN
+- ecosystemOpportunity: concise answers to whyMatter (why this organisation matters to Flanks), capability (what Flanks capability could be embedded or introduced), ownedWorkflow (what customer/workflow it already owns), downstreamIcp (what downstream Flanks ICP could potentially be reached), distributionLeverage (potential distribution leverage), evidence (what evidence supports this), needsValidating (what needs validating), commercialMotion (most likely: Direct sale / API / Embedded / Co-sell / Referral / Technology integration / Strategic partnership), and aiWealthtechThesis (for AI-native financial applications, the hypothesis: AI application -> requires permissioned financial context -> fragmented financial sources -> aggregation/normalisation/enrichment -> Flanks infrastructure -> AI experience; present ONLY as a hypothesis where evidence supports the use case, otherwise null).
+- multiplierInputs: set level for each dimension to high | medium | low | none | unknown based ONLY on the research:
+  - icpCustomerOverlap: does it serve wealth managers, private banks, family offices, advisers or other Flanks ICPs?
+  - workflowOwnership: does its product own an important adviser/client/portfolio/data workflow?
+  - dataDependency: would richer external wealth data materially improve the product/workflow?
+  - embeddingPotential: could Flanks APIs/data infrastructure plausibly be embedded?
+  - distributionLeverage: could one relationship expose Flanks to multiple downstream customers/users?
+  - strategicEcosystemValue: could the relationship create co-sell, integration, credibility or market-access advantages?
+  Provide a short reason and confidence for each. Use "unknown" where there is no evidence.` : "";
 
     const prompt = `You are conducting live public-web account research for an enterprise Account Executive selling wealth-data infrastructure (Flanks: "Aggregate" unifies multi-custodian wealth data; "Lume" enriches and reconciles it) into UK wealth management and financial services.
 
@@ -221,7 +290,7 @@ For executives: include a person ONLY when a name is publicly identifiable from 
 For relationshipRoutes: set routeStatus to "verified" only where the route is evidenced (e.g. a named partnership, a confirmed Salesforce ecosystem, a confirmed event/relationship); otherwise "to_investigate". Never imply Flanks has a relationship with another organisation without evidence.
 
 For painHypotheses: generate likely sales pains derivable from the researched evidence (e.g. fragmented custodian data, held-away assets, incomplete wealth visibility, manual reconciliation, portfolio reporting complexity, data-quality problems, adviser administration, AI-data readiness). Each must include why the hypothesis exists, the research finding that prompted it, a confidence score, and a discovery question. These are HYPOTHESIS — VALIDATE by definition.
-
+${ecosystemBlock}
 Return strictly as JSON matching the schema. Use null for any field that cannot be established.`;
 
     const llm = await base44.asServiceRole.integrations.Core.InvokeLLM({
@@ -237,6 +306,7 @@ Return strictly as JSON matching the schema. Use null for any field that cannot 
     const pains = Array.isArray(llm.painHypotheses) ? llm.painHypotheses : [];
     const routes = Array.isArray(llm.relationshipRoutes) ? llm.relationshipRoutes : [];
     const si = llm.scoringInputs || {};
+    const ecosystem = gtmMotion !== "Direct" ? llm.ecosystemAnalysis : null;
 
     // Find existing account (refresh) and clear old related records up front
     let existing = null;
@@ -322,6 +392,23 @@ Return strictly as JSON matching the schema. Use null for any field that cannot 
       priority: { flanksFit, timing, access, evidenceConfidence, score: priority }
     };
 
+    // --- Multiplier assessment (non-Direct accounts only) — does NOT affect Flanks Fit / Priority ---
+    const multMap = { high: 10, medium: 6, low: 3, none: 0 };
+    const mi = (ecosystem && ecosystem.multiplierInputs) || {};
+    const multDims = [
+      dim("ICP Customer Overlap", points(mi.icpCustomerOverlap?.level, multMap), 10, mi.icpCustomerOverlap?.level, mi.icpCustomerOverlap?.reason, mi.icpCustomerOverlap?.confidence),
+      dim("Workflow Ownership", points(mi.workflowOwnership?.level, multMap), 10, mi.workflowOwnership?.level, mi.workflowOwnership?.reason, mi.workflowOwnership?.confidence),
+      dim("Data Dependency", points(mi.dataDependency?.level, multMap), 10, mi.dataDependency?.level, mi.dataDependency?.reason, mi.dataDependency?.confidence),
+      dim("Embedding Potential", points(mi.embeddingPotential?.level, multMap), 10, mi.embeddingPotential?.level, mi.embeddingPotential?.reason, mi.embeddingPotential?.confidence),
+      dim("Distribution Leverage", points(mi.distributionLeverage?.level, multMap), 10, mi.distributionLeverage?.level, mi.distributionLeverage?.reason, mi.distributionLeverage?.confidence),
+      dim("Strategic Ecosystem Value", points(mi.strategicEcosystemValue?.level, multMap), 10, mi.strategicEcosystemValue?.level, mi.strategicEcosystemValue?.reason, mi.strategicEcosystemValue?.confidence)
+    ];
+    const multRaw = sum(multDims);
+    const multiplierPotential = norm(multRaw, 60);
+    const multiplierAssessment = { raw: multRaw, maximum: 60, normalized: multiplierPotential, dimensions: multDims };
+    const ecosystemOpportunity = (ecosystem && ecosystem.ecosystemOpportunity) || null;
+    const ecosystemRelationshipType = (ecosystem && ecosystem.relationshipType) || "UNKNOWN";
+
     const seg = (profile.segment || "").trim() || undefined;
     const accountFields = {
       name,
@@ -353,7 +440,12 @@ Return strictly as JSON matching the schema. Use null for any field that cannot 
       dataSource: "live",
       researchedAt: now,
       sourcesCount,
-      scoreBreakdown
+      scoreBreakdown,
+      gtmMotion,
+      multiplierPotential: gtmMotion !== "Direct" ? multiplierPotential : null,
+      multiplierAssessment: gtmMotion !== "Direct" ? multiplierAssessment : null,
+      ecosystemOpportunity: gtmMotion !== "Direct" ? ecosystemOpportunity : null,
+      ecosystemRelationshipType: gtmMotion !== "Direct" ? ecosystemRelationshipType : null
     };
 
     let account;

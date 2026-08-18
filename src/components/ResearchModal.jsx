@@ -17,6 +17,7 @@ const steps = [
 export default function ResearchModal({ onClose }) {
   const [name, setName] = useState("");
   const [domain, setDomain] = useState("");
+  const [gtmMotion, setGtmMotion] = useState("Direct");
   const [status, setStatus] = useState("idle");
   const [error, setError] = useState(null);
   const [focusIdx, setFocusIdx] = useState(0);
@@ -32,6 +33,7 @@ export default function ResearchModal({ onClose }) {
       const res = await base44.functions.invoke("researchAccount", {
         name: name.trim(),
         domain: domain.trim(),
+        gtmMotion,
       });
       clearInterval(interval);
       const accountId = res.data?.accountId || res.data?.account?.id;
@@ -87,6 +89,19 @@ export default function ResearchModal({ onClose }) {
                 placeholder="e.g. brewin.co.uk"
                 className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-200"
               />
+            </div>
+            <div>
+              <label className="text-xs font-medium text-slate-500">GTM motion</label>
+              <select
+                value={gtmMotion}
+                onChange={(e) => setGtmMotion(e.target.value)}
+                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-200"
+              >
+                <option value="Direct">Direct — end customer (wealth manager, bank, family office)</option>
+                <option value="Embedded">Embedded — technology company embedding Flanks</option>
+                <option value="Ecosystem">Ecosystem — distribution / co-sell platform</option>
+                <option value="Partner">Partner — influencer / introducer</option>
+              </select>
             </div>
             <button
               onClick={submit}

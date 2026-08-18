@@ -14,6 +14,9 @@ export default function AccountHeader({ account, onRefresh, onGenerate, onPresen
           <div className="flex items-center gap-2 flex-wrap">
             <h1 className="text-2xl font-semibold tracking-tight text-slate-900">{account.name}</h1>
             <span className="text-[10px] px-2 py-0.5 rounded-full ring-1 ring-indigo-200 bg-indigo-50 text-indigo-700 uppercase tracking-wider">{account.tier}</span>
+            {account.gtmMotion && account.gtmMotion !== "Direct" && (
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 ring-1 ring-sky-200 uppercase tracking-wider">{account.gtmMotion}</span>
+            )}
             {live ? (
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 uppercase tracking-wider">Live research</span>
             ) : (
