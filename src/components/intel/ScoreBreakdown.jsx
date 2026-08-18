@@ -9,9 +9,10 @@ function Dimension({ dim }) {
         <span className="text-xs text-slate-500 tabular-nums">{dim.score}/{dim.maximumScore}</span>
       </div>
       {dim.reason && <p className="mt-1 text-xs text-slate-500 leading-relaxed">{dim.reason}</p>}
-      {dim.supportingEvidenceIds && dim.supportingEvidenceIds.length > 0 && (
-        <p className="mt-0.5 text-[11px] text-slate-400">{dim.supportingEvidenceIds.length} evidence ref(s)</p>
-      )}
+      <div className="mt-0.5 flex items-center gap-3 text-[11px] text-slate-400">
+        {dim.level && <span className="uppercase tracking-wider">{dim.level}</span>}
+        {dim.confidence != null && <span>Confidence {dim.confidence}/100</span>}
+      </div>
     </div>
   );
 }

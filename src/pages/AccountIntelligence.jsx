@@ -103,7 +103,6 @@ export default function AccountIntelligence() {
       await base44.functions.invoke("researchAccount", {
         name: account.name,
         domain: account.domain,
-        segment: account.segment || null,
       });
       await loadAll(id);
     } catch (e) {
@@ -161,9 +160,9 @@ export default function AccountIntelligence() {
         <SectionTitle index="01" title="Account Overview" />
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
           <div className="flex items-center gap-2 mb-4">
-            {live ? <EvidenceBadge type="FACT" label="LIVE RESEARCHED" /> : <EvidenceBadge type="DEMO" />}
+            {live ? <EvidenceBadge type="VERIFIED_FACT" label="LIVE RESEARCH" /> : <EvidenceBadge type="DEMO" />}
             <span className="text-xs text-slate-400">
-              {live ? "Sourced from public web research — verify specifics in discovery." : "Organisation data is illustrative — to be replaced with verified research."}
+              {live ? "Live internet-grounded research — verify specifics in discovery." : "Organisation data is illustrative — to be replaced with verified research."}
             </span>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">

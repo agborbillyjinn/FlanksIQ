@@ -18,7 +18,7 @@ export default function CommitteeCard({ member }) {
     <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
       <div className="flex items-center justify-between">
         <span className="text-xs font-semibold text-slate-900 uppercase tracking-wider">{roleLabels[member.roleType] || member.roleType}</span>
-        {identified ? <EvidenceBadge type="INFERENCE" /> : <EvidenceBadge type="HYPOTHESIS" label="PERSONA" />}
+        {identified ? <EvidenceBadge type={member.sourceUrl ? "VERIFIED_FACT" : "GROUNDED_FINDING"} /> : <EvidenceBadge type="HYPOTHESIS" label="PERSONA" />}
       </div>
       <div className="mt-3 flex items-start gap-3">
         <div className="h-10 w-10 rounded-lg bg-slate-100 text-slate-400 flex items-center justify-center text-xs font-semibold shrink-0">

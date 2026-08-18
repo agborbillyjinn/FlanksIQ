@@ -3,18 +3,6 @@ import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { X, Loader2, CheckCircle2, Sparkles } from "lucide-react";
 
-const segments = [
-  "",
-  "Wealth Manager",
-  "Private Bank",
-  "Multi-Family Office",
-  "Asset Manager",
-  "Pension / Financial Platform",
-  "WealthTech",
-  "Embedded Wealth / FinTech",
-  "AI-Native Financial Services",
-];
-
 const steps = [
   "Researching public sources…",
   "Identifying company profile…",
@@ -29,7 +17,6 @@ const steps = [
 export default function ResearchModal({ onClose }) {
   const [name, setName] = useState("");
   const [domain, setDomain] = useState("");
-  const [segment, setSegment] = useState("");
   const [status, setStatus] = useState("idle");
   const [error, setError] = useState(null);
   const [focusIdx, setFocusIdx] = useState(0);
@@ -45,7 +32,6 @@ export default function ResearchModal({ onClose }) {
       const res = await base44.functions.invoke("researchAccount", {
         name: name.trim(),
         domain: domain.trim(),
-        segment: segment || null,
       });
       clearInterval(interval);
       const accountId = res.data?.accountId || res.data?.account?.id;
@@ -102,18 +88,6 @@ export default function ResearchModal({ onClose }) {
                 className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-200"
               />
             </div>
-            <div>
-              <label className="text-xs font-medium text-slate-500">Segment (optional)</label>
-              <select
-                value={segment}
-                onChange={(e) => setSegment(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-200"
-              >
-                {segments.map((s, i) => (
-                  <option key={i} value={s}>{s || "Infer during analysis"}</option>
-                ))}
-              </select>
-            </div>
             <button
               onClick={submit}
               disabled={!name.trim() || !domain.trim()}
@@ -121,7 +95,7 @@ export default function ResearchModal({ onClose }) {
             >
               <Sparkles className="h-4 w-4" /> Research Account
             </button>
-            <p className="text-[11px] text-slate-400 text-center">Live public web research via Tavily · AI proposes. Evidence proves. Sales validates.</p>
+            <p className="text-[11px] text-slate-400 text-center">Live internet-grounded research · AI proposes. Evidence proves. Sales validates.</p>
           </div>
         )}
 

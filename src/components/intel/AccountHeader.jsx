@@ -15,9 +15,9 @@ export default function AccountHeader({ account }) {
             <h1 className="text-2xl font-semibold tracking-tight text-slate-900">{account.name}</h1>
             <span className="text-[10px] px-2 py-0.5 rounded-full ring-1 ring-indigo-200 bg-indigo-50 text-indigo-700 uppercase tracking-wider">{account.tier}</span>
             {live ? (
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 uppercase tracking-wider">Live researched</span>
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 uppercase tracking-wider">Live research</span>
             ) : (
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 ring-1 ring-amber-200 uppercase tracking-wider">Demo</span>
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 ring-1 ring-amber-200 uppercase tracking-wider">Demo data</span>
             )}
           </div>
           <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-500">
@@ -31,8 +31,8 @@ export default function AccountHeader({ account }) {
           </div>
           {live && (
             <div className="mt-1.5 text-xs text-slate-400">
-              Last researched: {account.researchedAt ? new Date(account.researchedAt).toLocaleString("en-GB") : "—"}
-              {account.sourcesCount != null && ` · Sources: ${account.sourcesCount}`}
+              Last analysed: {account.researchedAt ? new Date(account.researchedAt).toLocaleString("en-GB") : "—"}
+              {account.sourcesCount != null && ` · Sourced findings: ${account.sourcesCount}`}
             </div>
           )}
         </div>

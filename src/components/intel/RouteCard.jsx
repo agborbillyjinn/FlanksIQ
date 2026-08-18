@@ -16,12 +16,15 @@ export default function RouteCard({ route }) {
     <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
       <div className="flex items-center justify-between">
         <span className="text-xs font-semibold text-slate-900 uppercase tracking-wider">{routeIcons[route.routeType] || route.routeType}</span>
-        {route.routeStatus === "verified" ? <EvidenceBadge type="FACT" label="VERIFIED ROUTE" /> : <EvidenceBadge type="DEMO" label="ROUTE TO INVESTIGATE" />}
+        {route.routeStatus === "verified" ? <EvidenceBadge type={route.sourceUrl ? "VERIFIED_FACT" : "GROUNDED_FINDING"} label="IDENTIFIED ROUTE" /> : <EvidenceBadge type="HYPOTHESIS" label="ROUTE TO INVESTIGATE" />}
       </div>
       <p className="mt-3 text-sm text-slate-600 leading-relaxed">{route.routeDescription || "Route to investigate — no evidence of an existing relationship yet."}</p>
       <div className="mt-3 pt-3 border-t border-slate-100 space-y-1.5 text-xs">
         <div className="flex gap-2"><span className="text-slate-400 w-24 shrink-0">Person / org</span><span className="text-slate-600">{route.organisation || route.person || "Not established"}</span></div>
         <div className="flex gap-2"><span className="text-slate-400 w-24 shrink-0">Confidence</span><span className="text-slate-600">{route.confidence != null ? `${route.confidence}/100` : "Not established"}</span></div>
+        {route.sourceUrl && (
+          <div className="flex gap-2"><span className="text-slate-400 w-24 shrink-0">Source</span><a href={route.sourceUrl} target="_blank" rel="noreferrer" className="text-sky-600 hover:text-sky-700 break-all">View source</a></div>
+        )}
       </div>
       {route.recommendedAction && (
         <div className="mt-3 p-3 rounded-lg bg-slate-50 border border-slate-100">

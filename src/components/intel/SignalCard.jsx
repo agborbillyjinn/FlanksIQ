@@ -19,7 +19,7 @@ const typeColors = {
 };
 
 export default function SignalCard({ signal }) {
-  const evType = signal.sourceUrl ? signal.evidenceType || "INFERENCE" : "DEMO";
+  const evType = signal.evidenceType || (signal.sourceUrl ? "GROUNDED_FINDING" : "DEMO");
   const typeClass = typeColors[signal.signalType] || "bg-slate-50 text-slate-600 border-slate-200";
   return (
     <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 flex flex-col">
@@ -37,9 +37,9 @@ export default function SignalCard({ signal }) {
         <div className="flex gap-2"><span className="text-slate-400 w-28 shrink-0">Confidence</span><span className="text-slate-600">{signal.confidence != null ? `${signal.confidence}/100` : "Not established"}</span></div>
         <div className="flex gap-2 items-center"><span className="text-slate-400 w-28 shrink-0">Source</span>
           {signal.sourceUrl ? (
-            <a href={signal.sourceUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-sky-600 hover:text-sky-700">{signal.sourceName || "View source"} <ExternalLink className="h-3 w-3" /></a>
+            <a href={signal.sourceUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-sky-600 hover:text-sky-700 break-all">{signal.sourceName || "View source"} <ExternalLink className="h-3 w-3 shrink-0" /></a>
           ) : (
-            <span className="text-slate-400">No source — demo</span>
+            <span className="text-slate-400">{evType === "DEMO" ? "Demo data" : "Source URL not available"}</span>
           )}
         </div>
       </div>

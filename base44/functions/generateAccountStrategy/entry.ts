@@ -67,7 +67,7 @@ export default async function(req) {
     ]);
 
     const evidenceBlock = evidence.map((e, i) =>
-      `E${i + 1} | ${e.searchTheme || "general"} | ${e.sourceTitle || ""} | ${e.publishedDate || "no date"} | ${e.sourceUrl}\n${(e.claim || "").slice(0, 500)}`
+      `E${i + 1} | ${e.evidenceType || "GROUNDED_FINDING"} | ${e.searchTheme || "general"} | ${e.sourceTitle || ""} | ${e.publishedDate || "no date"} | ${e.sourceUrl || "no url"}\n${(e.claim || "").slice(0, 500)}`
     ).join("\n\n");
 
     const signalsBlock = signals.map((s) =>
@@ -91,7 +91,7 @@ export default async function(req) {
 
     const prompt = `You are an enterprise sales strategist helping a UK Account Executive sell Flanks (wealth-data aggregation: Flanks Aggregate unifies multi-custodian wealth data; Lume enriches and reconciles it) into wealth management and financial services.
 
-Generate an account strategy using ONLY the researched evidence, signals, pain hypotheses, buying committee, relationship routes and score breakdown supplied below. Do not use unsupported prior knowledge. Clearly separate what is KNOWN (from evidence) from what is HYPOTHESISED. Never present a hypothesis as a fact. Where information is missing, say "Not established" rather than inventing details.
+Generate an account strategy using ONLY the researched evidence, signals, pain hypotheses, buying committee, relationship routes and score breakdown supplied below. Do not use unsupported prior knowledge. Evidence is classified as VERIFIED_FACT (sourced), GROUNDED_FINDING (live research, partial provenance) or HYPOTHESIS (sales interpretation). Treat only VERIFIED_FACT as established; treat GROUNDED_FINDING as likely-but-unconfirmed; never present a hypothesis as a fact. Where information is missing, say "Not established" rather than inventing details.
 
 ACCOUNT:
 - Name: ${account.name}

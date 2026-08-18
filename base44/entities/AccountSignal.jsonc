@@ -42,8 +42,8 @@
     "evidenceType": {
       "type": "string",
       "enum": [
-        "FACT",
-        "INFERENCE",
+        "VERIFIED_FACT",
+        "GROUNDED_FINDING",
         "HYPOTHESIS"
       ]
     },

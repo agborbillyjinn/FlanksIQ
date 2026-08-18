@@ -1,25 +1,21 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
-import { secrets } from 'base44:runtime';
 
-const SEARCH_THEMES = [
-  { id: "profile", q: (n) => `${n} wealth management AUM clients advisers UK` },
-  { id: "data_transformation", q: (n) => `${n} data transformation digital transformation technology modernisation` },
-  { id: "ai", q: (n) => `${n} AI artificial intelligence wealth management` },
-  { id: "technology", q: (n) => `${n} Salesforce Financial Services Cloud API cloud data platform technology` },
-  { id: "strategic_change", q: (n) => `${n} acquisition expansion new product partnership wealth management` },
-  { id: "leadership", q: (n) => `${n} CIO CTO CDO COO Head of Digital Head of Data Head of Wealth Operations` },
-  { id: "hiring", q: (n) => `${n} hiring data technology wealth operations Salesforce AI` },
-  { id: "wealth_data", q: (n) => `${n} custodians portfolio reporting external assets held away assets investment platform` },
+const signalTypeEnum = [
+  "AI", "Data Transformation", "Digital Transformation", "Salesforce", "Hiring",
+  "Executive Change", "M&A", "Expansion", "New Product", "Regulatory",
+  "Wealth Expansion", "Technology Modernisation", "Partnership"
 ];
 
-const levelDim = {
+const scoringLevel = {
   type: "object",
   properties: {
     level: { type: "string" },
     reason: { type: "string" },
-    supportingEvidenceIds: { type: "array", items: { type: "string" } }
+    confidence: { type: "number" },
+    sourceName: { type: "string" },
+    sourceUrl: { type: "string" }
   },
-  required: ["level", "reason", "supportingEvidenceIds"]
+  required: ["level", "reason"]
 };
 
 const responseSchema = {
@@ -28,7 +24,7 @@ const responseSchema = {
     companyProfile: {
       type: "object",
       properties: {
-        description: { type: "string" },
+        name: { type: "string" },
         segment: { type: "string" },
         subsegment: { type: "string" },
         headquarters: { type: "string" },
@@ -38,45 +34,49 @@ const responseSchema = {
         clientCount: { type: "number" },
         advisorCount: { type: "number" },
         locations: { type: "string" },
+        description: { type: "string" },
         website: { type: "string" },
-        linkedin: { type: "string" }
+        linkedin: { type: "string" },
+        classification: { type: "string", enum: ["VERIFIED_FACT", "GROUNDED_FINDING", "UNKNOWN"] },
+        confidence: { type: "number" },
+        sourceName: { type: "string" },
+        sourceUrl: { type: "string" }
       }
-    },
-    segmentClassification: {
-      type: "object",
-      properties: { segment: { type: "string" }, confidence: { type: "number" }, supportingEvidenceIds: { type: "array", items: { type: "string" } } },
-      required: ["segment", "supportingEvidenceIds"]
     },
     signals: {
       type: "array",
       items: {
         type: "object",
         properties: {
-          signalType: { type: "string" },
+          signalType: { type: "string", enum: signalTypeEnum },
           headline: { type: "string" },
           description: { type: "string" },
-          signalDate: { type: "string" },
-          evidenceType: { type: "string" },
+          classification: { type: "string", enum: ["VERIFIED_FACT", "GROUNDED_FINDING", "HYPOTHESIS"] },
           confidence: { type: "number" },
-          commercialRelevance: { type: "string" },
-          supportingEvidenceIds: { type: "array", items: { type: "string" } }
+          sourceName: { type: "string" },
+          sourceUrl: { type: "string" },
+          publishedDate: { type: "string" },
+          signalDate: { type: "string" },
+          commercialRelevance: { type: "string" }
         },
-        required: ["signalType", "headline", "evidenceType", "supportingEvidenceIds"]
+        required: ["signalType", "headline", "classification"]
       }
     },
-    relevantExecutives: {
+    executives: {
       type: "array",
       items: {
         type: "object",
         properties: {
           personName: { type: "string" },
           title: { type: "string" },
-          roleType: { type: "string" },
+          roleType: { type: "string", enum: ["Economic Buyer", "Champion", "Technical Buyer", "User", "Risk", "Commercial", "Influencer"] },
           linkedinUrl: { type: "string" },
+          classification: { type: "string", enum: ["VERIFIED_FACT", "GROUNDED_FINDING", "UNKNOWN"] },
           confidence: { type: "number" },
-          supportingEvidenceIds: { type: "array", items: { type: "string" } }
+          sourceName: { type: "string" },
+          sourceUrl: { type: "string" }
         },
-        required: ["title", "roleType", "supportingEvidenceIds"]
+        required: ["title", "roleType", "classification"]
       }
     },
     painHypotheses: {
@@ -88,89 +88,61 @@ const responseSchema = {
           reason: { type: "string" },
           evidence: { type: "string" },
           confidence: { type: "number" },
-          discoveryQuestion: { type: "string" },
-          supportingEvidenceIds: { type: "array", items: { type: "string" } }
+          discoveryQuestion: { type: "string" }
         },
-        required: ["hypothesis", "reason", "supportingEvidenceIds"]
+        required: ["hypothesis", "reason"]
       }
     },
-    possibleRelationshipRoutes: {
+    relationshipRoutes: {
       type: "array",
       items: {
         type: "object",
         properties: {
-          routeType: { type: "string" },
+          routeType: { type: "string", enum: ["Direct", "Partner", "Salesforce", "Technology", "Event", "Existing Relationship"] },
           routeDescription: { type: "string" },
           organisation: { type: "string" },
           person: { type: "string" },
           confidence: { type: "number" },
           recommendedAction: { type: "string" },
-          routeStatus: { type: "string" },
-          supportingEvidenceIds: { type: "array", items: { type: "string" } }
+          routeStatus: { type: "string", enum: ["verified", "to_investigate"] },
+          sourceName: { type: "string" },
+          sourceUrl: { type: "string" }
         },
-        required: ["routeType", "routeStatus", "supportingEvidenceIds"]
+        required: ["routeType", "routeStatus"]
       }
     },
     scoringInputs: {
       type: "object",
       properties: {
-        icpAlignment: levelDim,
-        wealthDataComplexity: levelDim,
-        commercialScale: levelDim,
-        multiCustodianComplexity: levelDim,
-        technologyCompatibility: levelDim,
-        strategicRelevance: levelDim,
-        transformationInitiative: levelDim,
-        aiDataInitiative: levelDim,
-        technologyModernisation: levelDim,
-        executiveChange: levelDim,
-        expansionMA: levelDim,
-        hiringTrigger: levelDim,
-        salesforceRoute: levelDim,
-        entryAngle: levelDim
-      },
-      required: ["icpAlignment", "wealthDataComplexity", "commercialScale", "multiCustodianComplexity", "technologyCompatibility", "strategicRelevance", "transformationInitiative", "aiDataInitiative", "technologyModernisation", "executiveChange", "expansionMA", "hiringTrigger", "salesforceRoute", "entryAngle"]
+        icpAlignment: scoringLevel,
+        wealthDataComplexity: scoringLevel,
+        commercialScale: scoringLevel,
+        multiCustodianComplexity: scoringLevel,
+        technologyCompatibility: scoringLevel,
+        strategicRelevance: scoringLevel,
+        transformationInitiative: scoringLevel,
+        aiDataInitiative: scoringLevel,
+        technologyModernisation: scoringLevel,
+        executiveChange: scoringLevel,
+        expansionMA: scoringLevel,
+        hiringTrigger: scoringLevel,
+        salesforceRoute: scoringLevel,
+        entryAngle: scoringLevel,
+        identifiableCommittee: scoringLevel,
+        partnerRoute: scoringLevel,
+        eventRoute: scoringLevel
+      }
     }
   },
-  required: ["companyProfile", "segmentClassification", "signals", "relevantExecutives", "painHypotheses", "possibleRelationshipRoutes", "scoringInputs"]
+  required: ["companyProfile", "signals", "executives", "painHypotheses", "relationshipRoutes", "scoringInputs"]
 };
 
-async function tavilySearch(apiKey, query) {
-  const res = await fetch("https://api.tavily.com/search", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      api_key: apiKey,
-      query,
-      search_depth: "advanced",
-      max_results: 5,
-      include_answer: false
-    })
-  });
-  if (!res.ok) throw new Error(`Tavily ${res.status}`);
-  const data = await res.json();
-  return (data.results || []).map((r) => ({
-    title: r.title || "",
-    url: r.url || "",
-    content: (r.content || "").slice(0, 800),
-    score: r.score || 0,
-    published_date: r.published_date || null
-  }));
+function points(level, map) {
+  return map[level] != null ? map[level] : 0;
 }
 
-function levelConfidence(level) {
-  if (["confirmed", "high", "large", "strong"].includes(level)) return 80;
-  if (["likely", "medium", "some", "inferred"].includes(level)) return 60;
-  if (["low", "small"].includes(level)) return 45;
-  return 30;
-}
-
-function dim(name, score, maximumScore, level, reason, ids) {
-  return { name, score, maximumScore, reason: reason || "", supportingEvidenceIds: ids || [], confidence: levelConfidence(level) };
-}
-
-function points(level, mapping) {
-  return mapping[level] != null ? mapping[level] : 0;
+function dim(name, score, maximumScore, level, reason, confidence) {
+  return { name, score, maximumScore, level: level || "unknown", reason: reason || null, confidence: confidence != null ? confidence : null };
 }
 
 export default async function(req) {
@@ -182,40 +154,89 @@ export default async function(req) {
     const body = await req.json();
     const name = body && body.name && body.name.trim();
     const domain = body && body.domain && body.domain.trim();
-    const suggestedSegment = body && body.segment;
     if (!name || !domain) return Response.json({ error: 'name and domain are required' }, { status: 400 });
 
-    const apiKey = secrets.get("TAVILY_API_KEY");
-    if (!apiKey) return Response.json({ error: 'Research temporarily unavailable. Please retry.' }, { status: 503 });
+    const prompt = `You are conducting live public-web account research for an enterprise Account Executive selling wealth-data infrastructure (Flanks: "Aggregate" unifies multi-custodian wealth data; "Lume" enriches and reconciles it) into UK wealth management and financial services.
 
-    // Run targeted searches
-    const searchResults = await Promise.allSettled(
-      SEARCH_THEMES.map((t) => tavilySearch(apiKey, t.q(name)).then((r) => ({ theme: t.id, results: r })))
-    );
-    const fulfilled = searchResults.filter((s) => s.status === "fulfilled").map((s) => s.value);
-    const allSearchesOk = fulfilled.length === SEARCH_THEMES.length;
+Use the live internet context available to you to research the company: ${name} (website: ${domain}).
 
-    // Deduplicate by URL, preserve theme
-    const seen = new Set();
-    const evidenceRaw = [];
-    for (const group of fulfilled) {
-      for (const r of group.results) {
-        if (!r.url || seen.has(r.url)) continue;
-        seen.add(r.url);
-        evidenceRaw.push({
-          theme: group.theme,
-          title: r.title,
-          url: r.url,
-          content: r.content,
-          score: r.score,
-          published_date: r.published_date
-        });
-      }
-    }
+Research across ALL of these areas (prioritise the most recent information for timing):
+1. Company profile (name, segment, headquarters, UK presence, locations, description, website, LinkedIn)
+2. Wealth-management / financial-services segment and subsegment
+3. Scale indicators (employees)
+4. AUM where publicly available
+5. Client numbers where publicly available
+6. Adviser numbers where publicly available
+7. Digital transformation programmes
+8. Data transformation / data infrastructure programmes
+9. AI initiatives and AI/data projects
+10. Technology modernisation
+11. Salesforce / CRM indicators
+12. Acquisitions
+13. Expansion (geographic or segment)
+14. New products / launches
+15. Relevant hiring signals
+16. Executive changes
+17. Relevant senior executives (name + title only when publicly identifiable)
+18. Wealth-data complexity indicators (multi-custodian, held-away assets, reconciliation, reporting complexity)
+19. Partnerships and other recent buying signals
 
-    if (evidenceRaw.length === 0) {
-      return Response.json({ error: 'Research temporarily unavailable. Please retry.' }, { status: 503 });
-    }
+STRICT RESEARCH RULES:
+- You are conducting live public-web research. Do not fill gaps with assumptions or prior knowledge.
+- If information cannot be established from available live internet context, return UNKNOWN / null. Do not guess.
+- Never invent: AUM, client counts, adviser counts, executive names, technology usage, Salesforce usage, acquisitions, partnerships, transformation programmes, or AI initiatives.
+- Separate factual research from sales interpretation.
+- Return a confidence score (0-100) for every important finding.
+
+EVIDENCE CLASSIFICATIONS (use exactly these for every signal, executive and the company profile):
+- VERIFIED_FACT — the finding is supported by enough identifiable source information (and a sourceUrl is available) to substantiate the claim.
+- GROUNDED_FINDING — information returned from live internet-grounded research where full source provenance is incomplete (sourceUrl may be null).
+- HYPOTHESIS — a sales interpretation / hypothesis requiring discovery validation (use this only for signals that are clearly interpretive, not for sourced facts).
+Never present an unsupported claim as VERIFIED_FACT. If sourceUrl is unavailable, leave it null — never fabricate a URL.
+
+For each signal, set signalType to one of: ${signalTypeEnum.join(", ")}. Emit a signal for every notable finding in those categories. Put company profile / scale / wealth-data complexity facts into companyProfile and the scoringInputs reasons rather than as signals.
+
+For scoringInputs, set "level" for each dimension based ONLY on what the live research supports:
+- icpAlignment: confirmed | inferred | unknown
+- wealthDataComplexity: high | medium | low | unknown
+- commercialScale: large | medium | small | unknown
+- multiCustodianComplexity: confirmed | likely | unknown
+- technologyCompatibility: confirmed | likely | unknown
+- strategicRelevance: confirmed | inferred | unknown
+- transformationInitiative: confirmed | likely | unknown
+- aiDataInitiative: confirmed | likely | unknown
+- technologyModernisation: confirmed | likely | unknown
+- executiveChange: confirmed | likely | unknown
+- expansionMA: confirmed | likely | unknown
+- hiringTrigger: confirmed | likely | unknown
+- salesforceRoute: confirmed | likely | unknown
+- entryAngle: strong | some | none
+- identifiableCommittee: confirmed | likely | unknown
+- partnerRoute: confirmed | likely | unknown
+- eventRoute: confirmed | likely | unknown
+Do not set "confirmed" without supporting research. Where there is no evidence, use "unknown". Provide a short reason and a confidence score for each.
+
+For executives: include a person ONLY when a name is publicly identifiable from the research; otherwise omit that executive. Never invent a name. Set roleType to the closest buying-committee role.
+
+For relationshipRoutes: set routeStatus to "verified" only where the route is evidenced (e.g. a named partnership, a confirmed Salesforce ecosystem, a confirmed event/relationship); otherwise "to_investigate". Never imply Flanks has a relationship with another organisation without evidence.
+
+For painHypotheses: generate likely sales pains derivable from the researched evidence (e.g. fragmented custodian data, held-away assets, incomplete wealth visibility, manual reconciliation, portfolio reporting complexity, data-quality problems, adviser administration, AI-data readiness). Each must include why the hypothesis exists, the research finding that prompted it, a confidence score, and a discovery question. These are HYPOTHESIS — VALIDATE by definition.
+
+Return strictly as JSON matching the schema. Use null for any field that cannot be established.`;
+
+    const llm = await base44.asServiceRole.integrations.Core.InvokeLLM({
+      prompt,
+      add_context_from_internet: true,
+      model: "gemini_3_1_pro",
+      response_json_schema: responseSchema
+    });
+
+    const profile = llm.companyProfile || {};
+    const signals = Array.isArray(llm.signals) ? llm.signals : [];
+    const executives = Array.isArray(llm.executives) ? llm.executives : [];
+    const pains = Array.isArray(llm.painHypotheses) ? llm.painHypotheses : [];
+    const routes = Array.isArray(llm.relationshipRoutes) ? llm.relationshipRoutes : [];
+    const si = llm.scoringInputs || {};
 
     // Find existing account (refresh) and clear old related records up front
     let existing = null;
@@ -235,99 +256,47 @@ export default async function(req) {
       ]);
     }
 
-    // Persist raw evidence first (facts at the source level)
-    const evidenceToCreate = evidenceRaw.map((e) => ({
-      account: name,
-      claim: `${e.title}. ${e.content}`.slice(0, 1000),
-      sourceUrl: e.url,
-      sourceTitle: e.title,
-      publishedDate: e.published_date || null,
-      evidenceType: "FACT",
-      confidence: Math.round((e.score || 0.5) * 100),
-      retrievedAt: new Date().toISOString(),
-      searchTheme: e.theme
-    }));
-    const evidenceRecords = await base44.entities.Evidence.bulkCreate(evidenceToCreate);
-    const idMap = {};
-    evidenceRecords.forEach((rec, i) => { idMap[`E${i + 1}`] = rec.id; });
+    // Persist research findings as Evidence (the research log)
+    const now = new Date().toISOString();
+    if (signals.length) {
+      await base44.entities.Evidence.bulkCreate(
+        signals.map((s) => ({
+          account: name,
+          claim: `${s.headline}${s.description ? `. ${s.description}` : ""}`.slice(0, 1000),
+          sourceUrl: s.sourceUrl || null,
+          sourceTitle: s.sourceName || null,
+          publishedDate: s.publishedDate || s.signalDate || null,
+          evidenceType: s.classification || "GROUNDED_FINDING",
+          confidence: s.confidence != null ? s.confidence : null,
+          retrievedAt: now,
+          searchTheme: s.signalType
+        }))
+      );
+    }
 
-    // Build LLM prompt with evidence only
-    const evidenceBlock = evidenceRaw.map((e, i) =>
-      `E${i + 1} | theme: ${e.theme} | title: ${e.title} | date: ${e.published_date || "unknown"} | url: ${e.url}\n${e.content}`
-    ).join("\n\n");
-
-    const prompt = `You are an enterprise sales research analyst supporting an Account Executive selling wealth-data infrastructure (Flanks: Aggregate unifies multi-custodian wealth data; Lume enriches and reconciles it).
-
-Analyse ONLY the evidence supplied below. Do not use unsupported prior knowledge to create company facts. Every factual company claim must reference one of the supplied evidence IDs (E1...E${evidenceRaw.length}). If evidence is insufficient, return null / UNKNOWN. Never fabricate AUM, client numbers, adviser numbers, technology usage, executives, initiatives, partnerships, acquisitions, Salesforce usage or AI projects.
-
-Distinguish:
-- FACT = directly supported by supplied evidence
-- INFERENCE = reasonable interpretation derived from one or more supplied facts
-- HYPOTHESIS = possible sales pain/opportunity requiring discovery validation
-Never convert a hypothesis into a fact.
-
-Company: ${name}
-Domain: ${domain}
-${suggestedSegment ? `Suggested segment: ${suggestedSegment}` : "Segment: infer from evidence if possible."}
-
-EVIDENCE:
-${evidenceBlock}
-
-Return JSON matching the schema. For companyProfile numeric fields, return null if not evidenced. For scoringInputs, set level based ONLY on evidence:
-- icpAlignment: confirmed | inferred | unknown
-- wealthDataComplexity: high | medium | low | unknown
-- commercialScale: large | medium | small | unknown
-- multiCustodianComplexity: confirmed | likely | unknown
-- technologyCompatibility: confirmed | likely | unknown
-- strategicRelevance: confirmed | inferred | unknown
-- transformationInitiative: confirmed | likely | unknown
-- aiDataInitiative: confirmed | likely | unknown
-- technologyModernisation: confirmed | likely | unknown
-- executiveChange: confirmed | likely | unknown
-- expansionMA: confirmed | likely | unknown
-- hiringTrigger: confirmed | likely | unknown
-- salesforceRoute: confirmed | likely | unknown
-- entryAngle: strong | some | none
-Do not set "confirmed" without supporting evidence IDs. Where there is no evidence, use "unknown".`;
-
-    const llm = await base44.asServiceRole.integrations.Core.InvokeLLM({
-      prompt,
-      response_json_schema: responseSchema,
-      model: "claude_sonnet_4_6"
-    });
-
-    const si = llm.scoringInputs || {};
-    const profile = llm.companyProfile || {};
-    const seg = (suggestedSegment || llm.segmentClassification?.segment || profile.segment || "").trim() || undefined;
-
-    // --- Scoring (calculated, not LLM-invented) ---
+    // --- Scoring (calculated deterministically from research levels, not LLM-invented) ---
     const flanksFitDims = [
-      dim("ICP Alignment", points(si.icpAlignment?.level, { confirmed: 10, inferred: 6, unknown: 0 }), 10, si.icpAlignment?.level || "unknown", si.icpAlignment?.reason, si.icpAlignment?.supportingEvidenceIds),
-      dim("Wealth Data Complexity", points(si.wealthDataComplexity?.level, { high: 15, medium: 9, low: 4, unknown: 0 }), 15, si.wealthDataComplexity?.level || "unknown", si.wealthDataComplexity?.reason, si.wealthDataComplexity?.supportingEvidenceIds),
-      dim("Commercial Potential", points(si.commercialScale?.level, { large: 10, medium: 6, small: 3, unknown: 0 }), 10, si.commercialScale?.level || "unknown", si.commercialScale?.reason, si.commercialScale?.supportingEvidenceIds),
-      dim("Multi-Custodian Complexity", points(si.multiCustodianComplexity?.level, { confirmed: 10, likely: 6, unknown: 0 }), 10, si.multiCustodianComplexity?.level || "unknown", si.multiCustodianComplexity?.reason, si.multiCustodianComplexity?.supportingEvidenceIds),
-      dim("Technology / Integration Compatibility", points(si.technologyCompatibility?.level, { confirmed: 10, likely: 6, unknown: 0 }), 10, si.technologyCompatibility?.level || "unknown", si.technologyCompatibility?.reason, si.technologyCompatibility?.supportingEvidenceIds),
-      dim("Strategic Relevance", points(si.strategicRelevance?.level, { confirmed: 5, inferred: 3, unknown: 0 }), 5, si.strategicRelevance?.level || "unknown", si.strategicRelevance?.reason, si.strategicRelevance?.supportingEvidenceIds)
+      dim("ICP Alignment", points(si.icpAlignment?.level, { confirmed: 10, inferred: 6 }), 10, si.icpAlignment?.level, si.icpAlignment?.reason, si.icpAlignment?.confidence),
+      dim("Wealth Data Complexity", points(si.wealthDataComplexity?.level, { high: 15, medium: 9, low: 4 }), 15, si.wealthDataComplexity?.level, si.wealthDataComplexity?.reason, si.wealthDataComplexity?.confidence),
+      dim("Commercial Potential", points(si.commercialScale?.level, { large: 10, medium: 6, small: 3 }), 10, si.commercialScale?.level, si.commercialScale?.reason, si.commercialScale?.confidence),
+      dim("Multi-Custodian Complexity", points(si.multiCustodianComplexity?.level, { confirmed: 10, likely: 6 }), 10, si.multiCustodianComplexity?.level, si.multiCustodianComplexity?.reason, si.multiCustodianComplexity?.confidence),
+      dim("Technology / Integration Compatibility", points(si.technologyCompatibility?.level, { confirmed: 10, likely: 6 }), 10, si.technologyCompatibility?.level, si.technologyCompatibility?.reason, si.technologyCompatibility?.confidence),
+      dim("Strategic Relevance", points(si.strategicRelevance?.level, { confirmed: 5, inferred: 3 }), 5, si.strategicRelevance?.level, si.strategicRelevance?.reason, si.strategicRelevance?.confidence)
     ];
     const timingDims = [
-      dim("Transformation Initiative", points(si.transformationInitiative?.level, { confirmed: 5, likely: 3, unknown: 0 }), 5, si.transformationInitiative?.level || "unknown", si.transformationInitiative?.reason, si.transformationInitiative?.supportingEvidenceIds),
-      dim("AI / Data Initiative", points(si.aiDataInitiative?.level, { confirmed: 5, likely: 3, unknown: 0 }), 5, si.aiDataInitiative?.level || "unknown", si.aiDataInitiative?.reason, si.aiDataInitiative?.supportingEvidenceIds),
-      dim("Technology Modernisation", points(si.technologyModernisation?.level, { confirmed: 4, likely: 2, unknown: 0 }), 4, si.technologyModernisation?.level || "unknown", si.technologyModernisation?.reason, si.technologyModernisation?.supportingEvidenceIds),
-      dim("Executive / Organisational Change", points(si.executiveChange?.level, { confirmed: 3, likely: 1, unknown: 0 }), 3, si.executiveChange?.level || "unknown", si.executiveChange?.reason, si.executiveChange?.supportingEvidenceIds),
-      dim("Expansion / M&A / Product Change", points(si.expansionMA?.level, { confirmed: 4, likely: 2, unknown: 0 }), 4, si.expansionMA?.level || "unknown", si.expansionMA?.reason, si.expansionMA?.supportingEvidenceIds),
-      dim("Relevant Hiring / Active Trigger", points(si.hiringTrigger?.level, { confirmed: 4, likely: 2, unknown: 0 }), 4, si.hiringTrigger?.level || "unknown", si.hiringTrigger?.reason, si.hiringTrigger?.supportingEvidenceIds)
+      dim("Transformation Initiative", points(si.transformationInitiative?.level, { confirmed: 5, likely: 3 }), 5, si.transformationInitiative?.level, si.transformationInitiative?.reason, si.transformationInitiative?.confidence),
+      dim("AI / Data Initiative", points(si.aiDataInitiative?.level, { confirmed: 5, likely: 3 }), 5, si.aiDataInitiative?.level, si.aiDataInitiative?.reason, si.aiDataInitiative?.confidence),
+      dim("Technology Modernisation", points(si.technologyModernisation?.level, { confirmed: 4, likely: 2 }), 4, si.technologyModernisation?.level, si.technologyModernisation?.reason, si.technologyModernisation?.confidence),
+      dim("Executive / Organisational Change", points(si.executiveChange?.level, { confirmed: 3, likely: 1 }), 3, si.executiveChange?.level, si.executiveChange?.reason, si.executiveChange?.confidence),
+      dim("Expansion / M&A / Product Change", points(si.expansionMA?.level, { confirmed: 4, likely: 2 }), 4, si.expansionMA?.level, si.expansionMA?.reason, si.expansionMA?.confidence),
+      dim("Relevant Hiring / Other Trigger", points(si.hiringTrigger?.level, { confirmed: 4, likely: 2 }), 4, si.hiringTrigger?.level, si.hiringTrigger?.reason, si.hiringTrigger?.confidence)
     ];
-    const execsWithNames = (llm.relevantExecutives || []).filter((e) => e.personName);
-    const routes = llm.possibleRelationshipRoutes || [];
-    const partnerVerified = routes.some((r) => r.routeType === "Partner" && r.routeStatus === "verified");
-    const partnerInvestigate = routes.some((r) => r.routeType === "Partner" && r.routeStatus === "to_investigate");
-    const eventVerified = routes.some((r) => (r.routeType === "Event" || r.routeType === "Existing Relationship") && r.routeStatus === "verified");
     const accessDims = [
-      dim("Identifiable Buying Committee", execsWithNames.length >= 2 ? 3 : execsWithNames.length === 1 ? 2 : 0, 3, execsWithNames.length >= 2 ? "confirmed" : execsWithNames.length === 1 ? "likely" : "unknown", `${execsWithNames.length} named executive(s) identified`, []),
-      dim("Partner / Ecosystem Route", partnerVerified ? 4 : partnerInvestigate ? 1 : 0, 4, partnerVerified ? "confirmed" : partnerInvestigate ? "likely" : "unknown", partnerVerified ? "Verified partner route" : partnerInvestigate ? "Partner route to investigate" : "No partner route", []),
-      dim("Salesforce / Technology Route", points(si.salesforceRoute?.level, { confirmed: 3, likely: 1, unknown: 0 }), 3, si.salesforceRoute?.level || "unknown", si.salesforceRoute?.reason, si.salesforceRoute?.supportingEvidenceIds),
-      dim("Event / Relationship Route", eventVerified ? 2 : 0, 2, eventVerified ? "confirmed" : "unknown", eventVerified ? "Verified event/relationship route" : "No event route", []),
-      dim("Compelling Personalised Entry Angle", points(si.entryAngle?.level, { strong: 3, some: 1, none: 0 }), 3, si.entryAngle?.level || "none", si.entryAngle?.reason, si.entryAngle?.supportingEvidenceIds)
+      dim("Identifiable Buying Committee", points(si.identifiableCommittee?.level, { confirmed: 3, likely: 2 }), 3, si.identifiableCommittee?.level, si.identifiableCommittee?.reason, si.identifiableCommittee?.confidence),
+      dim("Partner / Ecosystem Route", points(si.partnerRoute?.level, { confirmed: 4, likely: 1 }), 4, si.partnerRoute?.level, si.partnerRoute?.reason, si.partnerRoute?.confidence),
+      dim("Salesforce / Technology Route", points(si.salesforceRoute?.level, { confirmed: 3, likely: 1 }), 3, si.salesforceRoute?.level, si.salesforceRoute?.reason, si.salesforceRoute?.confidence),
+      dim("Event / Relationship Route", points(si.eventRoute?.level, { confirmed: 2, likely: 1 }), 2, si.eventRoute?.level, si.eventRoute?.reason, si.eventRoute?.confidence),
+      dim("Compelling Entry Angle", points(si.entryAngle?.level, { strong: 3, some: 1, none: 0 }), 3, si.entryAngle?.level, si.entryAngle?.reason, si.entryAngle?.confidence)
     ];
 
     const sum = (arr) => arr.reduce((a, d) => a + d.score, 0);
@@ -339,8 +308,9 @@ Do not set "confirmed" without supporting evidence IDs. Where there is no eviden
     const timing = norm(tmRaw, 25);
     const access = norm(acRaw, 15);
 
-    const sourcesCount = evidenceRaw.length;
-    const evidenceConfidence = Math.max(0, Math.min(100, Math.round(sourcesCount * 8) - (allSearchesOk ? 0 : 15)));
+    const sourcesCount = signals.filter((s) => s.sourceUrl).length;
+    const verifiedCount = signals.filter((s) => s.classification === "VERIFIED_FACT").length;
+    const evidenceConfidence = Math.max(0, Math.min(100, (signals.length ? 5 : 0) + sourcesCount * 8 + verifiedCount * 4));
     const priority = Math.round(0.45 * flanksFit + 0.30 * timing + 0.15 * access + 0.10 * evidenceConfidence);
     const tier = priority >= 80 ? "Tier 1" : priority >= 65 ? "Tier 2" : "Tier 3";
 
@@ -348,31 +318,11 @@ Do not set "confirmed" without supporting evidence IDs. Where there is no eviden
       flanksFit: { raw: ffRaw, maximum: 60, normalized: flanksFit, dimensions: flanksFitDims },
       timing: { raw: tmRaw, maximum: 25, normalized: timing, dimensions: timingDims },
       access: { raw: acRaw, maximum: 15, normalized: access, dimensions: accessDims },
-      evidenceConfidence: { score: evidenceConfidence, sourcesCount, reason: `${sourcesCount} source(s) retrieved${allSearchesOk ? "" : " (some searches failed)"}` },
+      evidenceConfidence: { score: evidenceConfidence, sourcesCount, verifiedCount, reason: `${sourcesCount} sourced finding(s), ${verifiedCount} verified fact(s) from live internet research` },
       priority: { flanksFit, timing, access, evidenceConfidence, score: priority }
     };
 
-    // Map evidence index -> meta for sourcing signals/routes
-    const metaByIndex = evidenceRaw;
-
-    function mapIds(ids) {
-      return (ids || []).map((x) => idMap[x] || x).filter(Boolean);
-    }
-    function urlForIds(ids) {
-      for (const x of (ids || [])) {
-        const idx = parseInt(String(x).replace("E", "")) - 1;
-        if (metaByIndex[idx]) return metaByIndex[idx].url;
-      }
-      return null;
-    }
-    function dateForIds(ids) {
-      for (const x of (ids || [])) {
-        const idx = parseInt(String(x).replace("E", "")) - 1;
-        if (metaByIndex[idx] && metaByIndex[idx].published_date) return metaByIndex[idx].published_date.slice(0, 10);
-      }
-      return null;
-    }
-
+    const seg = (profile.segment || "").trim() || undefined;
     const accountFields = {
       name,
       domain,
@@ -394,14 +344,14 @@ Do not set "confirmed" without supporting evidence IDs. Where there is no eviden
       evidenceConfidence,
       priorityScore: priority,
       tier,
-      primaryTrigger: (llm.signals && llm.signals[0] && llm.signals[0].headline) || null,
+      primaryTrigger: (signals[0] && signals[0].headline) || null,
       recommendedAction: (routes[0] && routes[0].recommendedAction) || null,
       salesforceDetected: si.salesforceRoute?.level === "confirmed" || si.salesforceRoute?.level === "likely",
       aiInitiativeDetected: si.aiDataInitiative?.level === "confirmed" || si.aiDataInitiative?.level === "likely",
       highDataComplexity: si.wealthDataComplexity?.level === "high" || si.wealthDataComplexity?.level === "medium",
       activeTrigger: tmRaw > 0,
       dataSource: "live",
-      researchedAt: new Date().toISOString(),
+      researchedAt: now,
       sourcesCount,
       scoreBreakdown
     };
@@ -413,59 +363,56 @@ Do not set "confirmed" without supporting evidence IDs. Where there is no eviden
       account = await base44.entities.Account.create(accountFields);
     }
 
-    // Re-create evidence (deleted above on refresh) — re-insert the persisted evidence under the final account name
-    // (Evidence was already created with account = name; if existing.name differs from name, re-link not needed since we used `name`.)
-
-    // Signals
-    if (llm.signals && llm.signals.length) {
+    // Signals (Why Now)
+    if (signals.length) {
       await base44.entities.AccountSignal.bulkCreate(
-        llm.signals.map((s) => ({
+        signals.map((s) => ({
           account: name,
           signalType: s.signalType,
           headline: s.headline,
           description: s.description || null,
-          signalDate: s.signalDate || dateForIds(s.supportingEvidenceIds) || null,
-          sourceUrl: urlForIds(s.supportingEvidenceIds),
-          sourceName: null,
-          evidenceType: s.evidenceType || "INFERENCE",
-          confidence: s.confidence || null,
+          signalDate: s.signalDate || s.publishedDate || null,
+          sourceUrl: s.sourceUrl || null,
+          sourceName: s.sourceName || null,
+          evidenceType: s.classification || "GROUNDED_FINDING",
+          confidence: s.confidence != null ? s.confidence : null,
           commercialRelevance: s.commercialRelevance || null,
           signalScore: null,
-          supportingEvidenceIds: mapIds(s.supportingEvidenceIds)
+          supportingEvidenceIds: []
         }))
       );
     }
 
     // Pain hypotheses
-    if (llm.painHypotheses && llm.painHypotheses.length) {
+    if (pains.length) {
       await base44.entities.PainHypothesis.bulkCreate(
-        llm.painHypotheses.map((p) => ({
+        pains.map((p) => ({
           account: name,
           hypothesis: p.hypothesis,
           reason: p.reason || null,
           evidence: p.evidence || null,
-          confidence: p.confidence || null,
+          confidence: p.confidence != null ? p.confidence : null,
           validationRequired: true,
           discoveryQuestion: p.discoveryQuestion || null,
-          supportingEvidenceIds: mapIds(p.supportingEvidenceIds)
+          supportingEvidenceIds: []
         }))
       );
     }
 
     // Buying committee
-    if (llm.relevantExecutives && llm.relevantExecutives.length) {
+    if (executives.length) {
       await base44.entities.BuyingCommitteeMember.bulkCreate(
-        llm.relevantExecutives.map((e) => ({
+        executives.map((e) => ({
           account: name,
           personName: e.personName || null,
           title: e.title,
           roleType: e.roleType,
           linkedinUrl: e.linkedinUrl || null,
-          influence: e.confidence || null,
+          influence: e.confidence != null ? e.confidence : null,
           likelyPriority: e.personName ? "High" : "Medium",
-          evidence: e.personName ? "Identified from public source" : "Not yet identified",
-          sourceUrl: urlForIds(e.supportingEvidenceIds),
-          supportingEvidenceIds: mapIds(e.supportingEvidenceIds)
+          evidence: e.personName ? (e.classification === "VERIFIED_FACT" ? "Identified from public source" : "Identified from live research (partial provenance)") : "Not yet identified — likely persona",
+          sourceUrl: e.sourceUrl || null,
+          supportingEvidenceIds: []
         }))
       );
     }
@@ -479,17 +426,17 @@ Do not set "confirmed" without supporting evidence IDs. Where there is no eviden
           routeDescription: r.routeDescription || null,
           organisation: r.organisation || null,
           person: r.person || null,
-          confidence: r.confidence || null,
+          confidence: r.confidence != null ? r.confidence : null,
           recommendedAction: r.recommendedAction || null,
           routeStatus: r.routeStatus === "verified" ? "verified" : "to_investigate",
-          sourceUrl: urlForIds(r.supportingEvidenceIds),
-          supportingEvidenceIds: mapIds(r.supportingEvidenceIds)
+          sourceUrl: r.sourceUrl || null,
+          supportingEvidenceIds: []
         }))
       );
     }
 
-    return Response.json({ accountId: account.id, account, sourcesCount, warnings: allSearchesOk ? [] : ["Some searches failed; evidence confidence reduced."] });
+    return Response.json({ accountId: account.id, account, sourcesCount, warnings: [] });
   } catch (error) {
-    return Response.json({ error: 'Research temporarily unavailable. Please retry.' }, { status: 503 });
+    return Response.json({ error: 'Live research temporarily unavailable. Please retry.' }, { status: 503 });
   }
 }
