@@ -30,7 +30,10 @@
       "type": "string"
     },
     "discoveryQuestions": {
-      "type": "string"
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     },
     "emailOutreach": {
       "type": "string"
@@ -42,7 +45,121 @@
       "type": "string"
     },
     "meddpicc": {
-      "type": "string"
+      "type": "object",
+      "properties": {
+        "metrics": {
+          "type": "object",
+          "properties": {
+            "known": {
+              "type": "string"
+            },
+            "hypothesised": {
+              "type": "string"
+            },
+            "unknown": {
+              "type": "string"
+            }
+          }
+        },
+        "economicBuyer": {
+          "type": "object",
+          "properties": {
+            "known": {
+              "type": "string"
+            },
+            "hypothesised": {
+              "type": "string"
+            },
+            "unknown": {
+              "type": "string"
+            }
+          }
+        },
+        "decisionCriteria": {
+          "type": "object",
+          "properties": {
+            "known": {
+              "type": "string"
+            },
+            "hypothesised": {
+              "type": "string"
+            },
+            "unknown": {
+              "type": "string"
+            }
+          }
+        },
+        "decisionProcess": {
+          "type": "object",
+          "properties": {
+            "known": {
+              "type": "string"
+            },
+            "hypothesised": {
+              "type": "string"
+            },
+            "unknown": {
+              "type": "string"
+            }
+          }
+        },
+        "paperProcess": {
+          "type": "object",
+          "properties": {
+            "known": {
+              "type": "string"
+            },
+            "hypothesised": {
+              "type": "string"
+            },
+            "unknown": {
+              "type": "string"
+            }
+          }
+        },
+        "identifyPain": {
+          "type": "object",
+          "properties": {
+            "known": {
+              "type": "string"
+            },
+            "hypothesised": {
+              "type": "string"
+            },
+            "unknown": {
+              "type": "string"
+            }
+          }
+        },
+        "champion": {
+          "type": "object",
+          "properties": {
+            "known": {
+              "type": "string"
+            },
+            "hypothesised": {
+              "type": "string"
+            },
+            "unknown": {
+              "type": "string"
+            }
+          }
+        },
+        "competition": {
+          "type": "object",
+          "properties": {
+            "known": {
+              "type": "string"
+            },
+            "hypothesised": {
+              "type": "string"
+            },
+            "unknown": {
+              "type": "string"
+            }
+          }
+        }
+      }
     },
     "nextAction": {
       "type": "string"

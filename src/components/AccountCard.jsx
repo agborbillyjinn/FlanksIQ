@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import ScoreIndicator from "@/components/ScoreIndicator";
 
 export default function AccountCard({ account }) {
@@ -11,7 +12,7 @@ export default function AccountCard({ account }) {
             {a.name?.slice(0, 2).toUpperCase()}
           </div>
           <div>
-            <div className="font-semibold text-slate-900">{a.name}</div>
+            <Link to={`/accounts/${a.id}`} className="font-semibold text-slate-900 hover:text-sky-700">{a.name}</Link>
             <div className="text-xs text-slate-400">{a.segment}</div>
           </div>
         </div>

@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { ArrowUpDown, ExternalLink } from "lucide-react";
 import ScoreIndicator, { scoreColor } from "@/components/ScoreIndicator";
 
@@ -42,7 +43,7 @@ export default function PriorityAccountsTable({ accounts, sortBy, onSort }) {
                       </div>
                       <div>
                         <div className="font-medium text-slate-900 flex items-center gap-1.5">
-                          {a.name}
+                          <Link to={`/accounts/${a.id}`} className="hover:text-sky-700">{a.name}</Link>
                           {a.website && (
                             <a href={a.website} target="_blank" rel="noreferrer">
                               <ExternalLink className="h-3 w-3 text-slate-300 hover:text-slate-500" />

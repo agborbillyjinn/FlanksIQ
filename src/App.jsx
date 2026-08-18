@@ -16,6 +16,7 @@ import ResetPassword from "@/pages/ResetPassword";
 import UKTerritory from "@/pages/UKTerritory";
 import PriorityAccounts from "@/pages/PriorityAccounts";
 import Accounts from "@/pages/Accounts";
+import AccountIntelligence from "@/pages/AccountIntelligence";
 import Signals from "@/pages/Signals";
 import AccountStrategy from "@/pages/AccountStrategy";
 import DataEvidence from "@/pages/DataEvidence";
@@ -55,6 +56,7 @@ const AuthenticatedApp = () => {
           <Route path="/" element={<UKTerritory />} />
           <Route path="/priority-accounts" element={<PriorityAccounts />} />
           <Route path="/accounts" element={<Accounts />} />
+          <Route path="/accounts/:id" element={<AccountIntelligence />} />
           <Route path="/signals" element={<Signals />} />
           <Route path="/account-strategy" element={<AccountStrategy />} />
           <Route path="/data-evidence" element={<DataEvidence />} />

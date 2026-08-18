@@ -39,6 +39,14 @@
     "sourceName": {
       "type": "string"
     },
+    "evidenceType": {
+      "type": "string",
+      "enum": [
+        "FACT",
+        "INFERENCE",
+        "HYPOTHESIS"
+      ]
+    },
     "confidence": {
       "type": "number"
     },
