@@ -30,6 +30,22 @@
     },
     "recommendedAction": {
       "type": "string"
+    },
+    "routeStatus": {
+      "type": "string",
+      "enum": [
+        "verified",
+        "to_investigate"
+      ]
+    },
+    "sourceUrl": {
+      "type": "string"
+    },
+    "supportingEvidenceIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     }
   },
   "required": [

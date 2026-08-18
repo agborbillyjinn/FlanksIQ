@@ -55,6 +55,12 @@
     },
     "signalScore": {
       "type": "number"
+    },
+    "supportingEvidenceIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     }
   },
   "required": [

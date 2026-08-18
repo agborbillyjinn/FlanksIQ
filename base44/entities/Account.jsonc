@@ -97,6 +97,23 @@
     },
     "activeTrigger": {
       "type": "boolean"
+    },
+    "dataSource": {
+      "type": "string",
+      "enum": [
+        "demo",
+        "live"
+      ]
+    },
+    "researchedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "sourcesCount": {
+      "type": "number"
+    },
+    "scoreBreakdown": {
+      "type": "object"
     }
   },
   "required": [

@@ -34,6 +34,15 @@
     },
     "evidence": {
       "type": "string"
+    },
+    "sourceUrl": {
+      "type": "string"
+    },
+    "supportingEvidenceIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     }
   },
   "required": [

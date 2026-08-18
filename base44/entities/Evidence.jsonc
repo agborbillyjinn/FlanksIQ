@@ -32,6 +32,9 @@
     "retrievedAt": {
       "type": "string",
       "format": "date-time"
+    },
+    "searchTheme": {
+      "type": "string"
     }
   },
   "required": [

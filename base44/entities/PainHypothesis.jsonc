@@ -11,6 +11,9 @@
     "reason": {
       "type": "string"
     },
+    "evidence": {
+      "type": "string"
+    },
     "confidence": {
       "type": "number"
     },
@@ -19,6 +22,12 @@
     },
     "discoveryQuestion": {
       "type": "string"
+    },
+    "supportingEvidenceIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     }
   },
   "required": [
