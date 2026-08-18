@@ -1,0 +1,39 @@
+{
+  "name": "RelationshipRoute",
+  "type": "object",
+  "properties": {
+    "account": {
+      "type": "string"
+    },
+    "routeType": {
+      "type": "string",
+      "enum": [
+        "Direct",
+        "Partner",
+        "Salesforce",
+        "Technology",
+        "Event",
+        "Existing Relationship"
+      ]
+    },
+    "routeDescription": {
+      "type": "string"
+    },
+    "organisation": {
+      "type": "string"
+    },
+    "person": {
+      "type": "string"
+    },
+    "confidence": {
+      "type": "number"
+    },
+    "recommendedAction": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "account",
+    "routeType"
+  ]
+}

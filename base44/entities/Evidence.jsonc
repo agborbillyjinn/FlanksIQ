@@ -1,0 +1,42 @@
+{
+  "name": "Evidence",
+  "type": "object",
+  "properties": {
+    "account": {
+      "type": "string"
+    },
+    "claim": {
+      "type": "string"
+    },
+    "sourceUrl": {
+      "type": "string"
+    },
+    "sourceTitle": {
+      "type": "string"
+    },
+    "publishedDate": {
+      "type": "string",
+      "format": "date"
+    },
+    "evidenceType": {
+      "type": "string",
+      "enum": [
+        "FACT",
+        "INFERENCE",
+        "HYPOTHESIS"
+      ]
+    },
+    "confidence": {
+      "type": "number"
+    },
+    "retrievedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "account",
+    "claim",
+    "evidenceType"
+  ]
+}

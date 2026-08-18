@@ -1,0 +1,58 @@
+{
+  "name": "AccountStrategy",
+  "type": "object",
+  "properties": {
+    "account": {
+      "type": "string"
+    },
+    "accountThesis": {
+      "type": "string"
+    },
+    "primaryPain": {
+      "type": "string"
+    },
+    "whyNow": {
+      "type": "string"
+    },
+    "bestEntryPersona": {
+      "type": "string"
+    },
+    "commercialTrigger": {
+      "type": "string"
+    },
+    "flanksWedge": {
+      "type": "string"
+    },
+    "expansionPath": {
+      "type": "string"
+    },
+    "relationshipRoute": {
+      "type": "string"
+    },
+    "discoveryQuestions": {
+      "type": "string"
+    },
+    "emailOutreach": {
+      "type": "string"
+    },
+    "linkedinOutreach": {
+      "type": "string"
+    },
+    "callOpener": {
+      "type": "string"
+    },
+    "meddpicc": {
+      "type": "string"
+    },
+    "nextAction": {
+      "type": "string"
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "account"
+  ]
+}

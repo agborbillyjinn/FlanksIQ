@@ -1,0 +1,57 @@
+{
+  "name": "AccountSignal",
+  "type": "object",
+  "properties": {
+    "account": {
+      "type": "string"
+    },
+    "signalType": {
+      "type": "string",
+      "enum": [
+        "AI",
+        "Data Transformation",
+        "Digital Transformation",
+        "Salesforce",
+        "Hiring",
+        "Executive Change",
+        "M&A",
+        "Expansion",
+        "New Product",
+        "Regulatory",
+        "Wealth Expansion",
+        "Technology Modernisation",
+        "Partnership"
+      ]
+    },
+    "headline": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "signalDate": {
+      "type": "string",
+      "format": "date"
+    },
+    "sourceUrl": {
+      "type": "string"
+    },
+    "sourceName": {
+      "type": "string"
+    },
+    "confidence": {
+      "type": "number"
+    },
+    "commercialRelevance": {
+      "type": "string"
+    },
+    "signalScore": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "account",
+    "signalType",
+    "headline"
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "name": "BuyingCommitteeMember",
+  "type": "object",
+  "properties": {
+    "account": {
+      "type": "string"
+    },
+    "personName": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "roleType": {
+      "type": "string",
+      "enum": [
+        "Economic Buyer",
+        "Champion",
+        "Technical Buyer",
+        "User",
+        "Risk",
+        "Commercial",
+        "Influencer"
+      ]
+    },
+    "linkedinUrl": {
+      "type": "string"
+    },
+    "influence": {
+      "type": "number"
+    },
+    "likelyPriority": {
+      "type": "string"
+    },
+    "evidence": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "account",
+    "personName",
+    "roleType"
+  ]
+}

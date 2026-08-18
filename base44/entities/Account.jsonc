@@ -1,0 +1,105 @@
+{
+  "name": "Account",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "domain": {
+      "type": "string"
+    },
+    "logo": {
+      "type": "string"
+    },
+    "segment": {
+      "type": "string",
+      "enum": [
+        "Wealth Manager",
+        "Private Bank",
+        "Multi-Family Office",
+        "Asset Manager",
+        "Pension / Financial Platform",
+        "WealthTech",
+        "Embedded Wealth / FinTech",
+        "AI-Native Financial Services"
+      ]
+    },
+    "subsegment": {
+      "type": "string"
+    },
+    "headquarters": {
+      "type": "string"
+    },
+    "ukPresence": {
+      "type": "string"
+    },
+    "employeeCount": {
+      "type": "number"
+    },
+    "aum": {
+      "type": "number"
+    },
+    "clientCount": {
+      "type": "number"
+    },
+    "advisorCount": {
+      "type": "number"
+    },
+    "locations": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "website": {
+      "type": "string"
+    },
+    "linkedin": {
+      "type": "string"
+    },
+    "flanksFitScore": {
+      "type": "number"
+    },
+    "timingScore": {
+      "type": "number"
+    },
+    "accessScore": {
+      "type": "number"
+    },
+    "evidenceConfidence": {
+      "type": "number"
+    },
+    "priorityScore": {
+      "type": "number"
+    },
+    "tier": {
+      "type": "string",
+      "enum": [
+        "Tier 1",
+        "Tier 2",
+        "Tier 3"
+      ]
+    },
+    "primaryTrigger": {
+      "type": "string"
+    },
+    "recommendedAction": {
+      "type": "string"
+    },
+    "salesforceDetected": {
+      "type": "boolean"
+    },
+    "aiInitiativeDetected": {
+      "type": "boolean"
+    },
+    "highDataComplexity": {
+      "type": "boolean"
+    },
+    "activeTrigger": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}
