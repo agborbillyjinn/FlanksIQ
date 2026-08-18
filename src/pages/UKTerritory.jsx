@@ -4,6 +4,7 @@ import KpiCard from "@/components/KpiCard";
 import FilterBar from "@/components/FilterBar";
 import PriorityAccountsTable from "@/components/PriorityAccountsTable";
 import PageHeader from "@/components/PageHeader";
+import AnalyseAccountButton from "@/components/AnalyseAccountButton";
 
 export default function UKTerritory() {
   const [accounts, setAccounts] = useState([]);
@@ -48,11 +49,14 @@ export default function UKTerritory() {
 
   return (
     <div className="px-8 py-8 max-w-[1400px] mx-auto">
-      <PageHeader
-        title="UK Territory Intelligence"
-        subtitle="Evidence-led account prioritisation for the UK wealth market."
-        demo
-      />
+      <div className="flex items-start justify-between gap-4">
+        <PageHeader
+          title="UK Territory Intelligence"
+          subtitle="Evidence-led account prioritisation for the UK wealth market."
+          demo
+        />
+        <AnalyseAccountButton />
+      </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
         <KpiCard label="Total Accounts" value={loading ? "—" : kpis.total} sublabel="UK ICP universe" />

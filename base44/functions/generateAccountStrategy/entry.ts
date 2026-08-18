@@ -57,44 +57,82 @@ export default async function(req) {
     const account = await base44.entities.Account.get(accountId);
     if (!account) return Response.json({ error: 'Account not found' }, { status: 404 });
 
-    const prompt = `You are an enterprise sales strategist helping a UK Account Executive sell Flanks (a wealth-data aggregation platform: Flanks Aggregate unifies multi-custodian wealth data; Lume enriches and reconciles it) into wealth management and financial services.
+    const name = account.name;
+    const [evidence, signals, pains, committee, routes] = await Promise.all([
+      base44.entities.Evidence.filter({ account: name }, "-retrievedAt", 40),
+      base44.entities.AccountSignal.filter({ account: name }, "-signalDate", 30),
+      base44.entities.PainHypothesis.filter({ account: name }, "-created_date", 20),
+      base44.entities.BuyingCommitteeMember.filter({ account: name }, "-influence", 20),
+      base44.entities.RelationshipRoute.filter({ account: name }, "-confidence", 20)
+    ]);
 
-Generate an account strategy for this UK account. Use ONLY the data provided below. Where information is missing, say "Not established" rather than inventing details. Clearly separate what is KNOWN from what is HYPOTHESISED. Never present a hypothesis as a fact.
+    const evidenceBlock = evidence.map((e, i) =>
+      `E${i + 1} | ${e.searchTheme || "general"} | ${e.sourceTitle || ""} | ${e.publishedDate || "no date"} | ${e.sourceUrl}\n${(e.claim || "").slice(0, 500)}`
+    ).join("\n\n");
 
-ACCOUNT DATA:
+    const signalsBlock = signals.map((s) =>
+      `- [${s.evidenceType || "INFERENCE"}] ${s.signalType}: ${s.headline}${s.signalDate ? ` (${s.signalDate})` : ""}${s.sourceUrl ? ` — source: ${s.sourceUrl}` : ""}`
+    ).join("\n");
+
+    const painsBlock = pains.map((p) => `- ${p.hypothesis}${p.discoveryQuestion ? ` (ask: ${p.discoveryQuestion})` : ""}`).join("\n");
+
+    const committeeBlock = committee.map((c) =>
+      `- ${c.roleType}: ${c.personName ? `${c.personName} (${c.title})` : `${c.title} — person not yet identified`}`
+    ).join("\n");
+
+    const routesBlock = routes.map((r) =>
+      `- ${r.routeType} [${r.routeStatus === "verified" ? "VERIFIED" : "ROUTE TO INVESTIGATE"}]: ${r.routeDescription || ""}${r.recommendedAction ? ` → ${r.recommendedAction}` : ""}`
+    ).join("\n");
+
+    const breakdown = account.scoreBreakdown;
+    const breakdownText = breakdown
+      ? `Flanks Fit ${breakdown.flanksFit?.normalized}/100 (raw ${breakdown.flanksFit?.raw}/60), Timing ${breakdown.timing?.normalized}/100 (raw ${breakdown.timing?.raw}/25), Access ${breakdown.access?.normalized}/100 (raw ${breakdown.access?.raw}/15), Evidence Confidence ${breakdown.evidenceConfidence?.score}/100, Priority ${breakdown.priority?.score}/100.`
+      : `Flanks Fit ${account.flanksFitScore}, Timing ${account.timingScore}, Access ${account.accessScore}, Evidence ${account.evidenceConfidence}, Priority ${account.priorityScore}.`;
+
+    const prompt = `You are an enterprise sales strategist helping a UK Account Executive sell Flanks (wealth-data aggregation: Flanks Aggregate unifies multi-custodian wealth data; Lume enriches and reconciles it) into wealth management and financial services.
+
+Generate an account strategy using ONLY the researched evidence, signals, pain hypotheses, buying committee, relationship routes and score breakdown supplied below. Do not use unsupported prior knowledge. Clearly separate what is KNOWN (from evidence) from what is HYPOTHESISED. Never present a hypothesis as a fact. Where information is missing, say "Not established" rather than inventing details.
+
+ACCOUNT:
 - Name: ${account.name}
-- Segment: ${account.segment}
+- Segment: ${account.segment || "Not established"}
 - Subsegment: ${account.subsegment || "Not established"}
 - Headquarters: ${account.headquarters || "Not established"}
 - Employees: ${account.employeeCount || "Not established"}
-- AUM (£): ${account.aum || "Not established"}
+- AUM: ${account.aum || "Not established"}
 - Clients: ${account.clientCount || "Not established"}
 - Advisers: ${account.advisorCount || "Not established"}
-- UK locations: ${account.locations || "Not established"}
-- Flanks Fit Score: ${account.flanksFitScore}/100
-- Timing Score: ${account.timingScore}/100
-- Access Score: ${account.accessScore}/100
-- Evidence Confidence: ${account.evidenceConfidence}/100
-- Priority Score: ${account.priorityScore}/100
+- Primary trigger: ${account.primaryTrigger || "Not established"}
 - Tier: ${account.tier}
-- Primary Trigger: ${account.primaryTrigger || "Not established"}
-- Recommended Action: ${account.recommendedAction || "Not established"}
-- Salesforce detected: ${account.salesforceDetected}
-- AI initiative detected: ${account.aiInitiativeDetected}
-- High data complexity: ${account.highDataComplexity}
-- Active trigger: ${account.activeTrigger}
+- Data source: ${account.dataSource || "demo"}
+- Score breakdown: ${breakdownText}
+
+EVIDENCE (researched sources):
+${evidenceBlock || "No evidence stored."}
+
+SIGNALS:
+${signalsBlock || "No signals stored."}
+
+PAIN HYPOTHESES:
+${painsBlock || "No pain hypotheses stored."}
+
+BUYING COMMITTEE:
+${committeeBlock || "No committee mapped."}
+
+RELATIONSHIP ROUTES:
+${routesBlock || "No routes mapped."}
 
 Produce:
-1. accountThesis — a concise sales hypothesis (max ~100 words) on why this organisation could be a Flanks opportunity.
+1. accountThesis — concise sales hypothesis (max ~100 words) on why this organisation could be a Flanks opportunity, grounded in the evidence.
 2. whyNow — the evidence-backed reason to engage now.
-3. primaryPain — the single most likely pain to validate.
-4. bestEntryPersona — the persona to approach first (role, not a fabricated name).
+3. primaryPain — the single most likely pain to validate (from the pain hypotheses).
+4. bestEntryPersona — the persona to approach first (role, not a fabricated name; use a named person only if one appears in the committee).
 5. commercialTrigger — the commercial event creating urgency.
 6. flanksWedge — the likely initial Flanks wedge to test.
 7. expansionPath — the potential expansion beyond the wedge.
-8. relationshipRoute — the best route into the account.
+8. relationshipRoute — the best route into the account (from the routes).
 9. discoveryQuestions — 5-7 concise, account-specific discovery questions.
-10. emailOutreach — a concise, executive-level cold email (refer to hypotheses, not facts).
+10. emailOutreach — a concise, executive-level cold email (reference hypotheses, not facts).
 11. linkedinOutreach — a concise LinkedIn connection note.
 12. callOpener — a 2-sentence call opener.
 13. meddpicc — for each of the 8 categories, provide known / hypothesised / unknown (use "Not established" where unknown; do not fabricate).

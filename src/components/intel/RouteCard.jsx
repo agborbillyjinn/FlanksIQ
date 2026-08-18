@@ -16,7 +16,7 @@ export default function RouteCard({ route }) {
     <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
       <div className="flex items-center justify-between">
         <span className="text-xs font-semibold text-slate-900 uppercase tracking-wider">{routeIcons[route.routeType] || route.routeType}</span>
-        {hasEvidence ? <EvidenceBadge type="INFERENCE" /> : <EvidenceBadge type="DEMO" label="ROUTE TO INVESTIGATE" />}
+        {route.routeStatus === "verified" ? <EvidenceBadge type="FACT" label="VERIFIED ROUTE" /> : <EvidenceBadge type="DEMO" label="ROUTE TO INVESTIGATE" />}
       </div>
       <p className="mt-3 text-sm text-slate-600 leading-relaxed">{route.routeDescription || "Route to investigate — no evidence of an existing relationship yet."}</p>
       <div className="mt-3 pt-3 border-t border-slate-100 space-y-1.5 text-xs">

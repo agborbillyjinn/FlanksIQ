@@ -9,8 +9,9 @@ import RouteCard from "@/components/intel/RouteCard";
 import CommitteeCard from "@/components/intel/CommitteeCard";
 import SolutionJourney from "@/components/intel/SolutionJourney";
 import AccountStrategyPanel from "@/components/intel/AccountStrategyPanel";
+import ScoreBreakdown from "@/components/intel/ScoreBreakdown";
 import EvidenceBadge from "@/components/intel/EvidenceBadge";
-import { ArrowLeft, Sparkles, Loader2 } from "lucide-react";
+import { ArrowLeft, Sparkles, Loader2, RefreshCw } from "lucide-react";
 
 function OverviewField({ label, value }) {
   return (
@@ -49,25 +50,30 @@ export default function AccountIntelligence() {
   const [strategy, setStrategy] = useState(null);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
+
+  const loadAll = async (accId) => {
+    const acc = await base44.entities.Account.get(accId);
+    setAccount(acc);
+    const name = acc.name;
+    const [s, p, c, r, st] = await Promise.all([
+      base44.entities.AccountSignal.filter({ account: name }, "-signalDate", 50),
+      base44.entities.PainHypothesis.filter({ account: name }, "-created_date", 50),
+      base44.entities.BuyingCommitteeMember.filter({ account: name }, "-influence", 50),
+      base44.entities.RelationshipRoute.filter({ account: name }, "-confidence", 50),
+      base44.entities.AccountStrategy.filter({ account: name }, "-generatedAt", 1),
+    ]);
+    setSignals(s); setPains(p); setCommittee(c); setRoutes(r);
+    if (st.length) setStrategy(st[0]); else setStrategy(null);
+  };
 
   useEffect(() => {
     if (!id) return;
     (async () => {
       setLoading(true);
       try {
-        const acc = await base44.entities.Account.get(id);
-        setAccount(acc);
-        const name = acc.name;
-        const [s, p, c, r, st] = await Promise.all([
-          base44.entities.AccountSignal.filter({ account: name }, "-signalDate", 50),
-          base44.entities.PainHypothesis.filter({ account: name }, "-created_date", 50),
-          base44.entities.BuyingCommitteeMember.filter({ account: name }, "-influence", 50),
-          base44.entities.RelationshipRoute.filter({ account: name }, "-confidence", 50),
-          base44.entities.AccountStrategy.filter({ account: name }, "-generatedAt", 1),
-        ]);
-        setSignals(s); setPains(p); setCommittee(c); setRoutes(r);
-        if (st.length) setStrategy(st[0]);
+        await loadAll(id);
       } catch (e) {
         setError(e.message);
       } finally {
@@ -89,6 +95,24 @@ export default function AccountIntelligence() {
     }
   };
 
+  const handleRefresh = async () => {
+    if (!account) return;
+    setRefreshing(true);
+    setError(null);
+    try {
+      await base44.functions.invoke("researchAccount", {
+        name: account.name,
+        domain: account.domain,
+        segment: account.segment || null,
+      });
+      await loadAll(id);
+    } catch (e) {
+      setError("Research temporarily unavailable. Please retry.");
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="px-8 py-20 text-center text-sm text-slate-400">
@@ -105,23 +129,42 @@ export default function AccountIntelligence() {
     );
   }
 
+  const live = account.dataSource === "live";
   const thesis = strategy?.accountThesis || buildThesis(account);
 
   return (
     <div className="px-8 py-8 max-w-[1200px] mx-auto pb-24">
-      <Link to="/" className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-700 mb-4">
-        <ArrowLeft className="h-3.5 w-3.5" /> UK Territory
-      </Link>
+      <div className="flex items-center justify-between mb-4">
+        <Link to="/" className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-700">
+          <ArrowLeft className="h-3.5 w-3.5" /> UK Territory
+        </Link>
+        <button
+          onClick={handleRefresh}
+          disabled={refreshing}
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-700 text-xs hover:border-slate-300 disabled:opacity-60 transition-colors"
+        >
+          {refreshing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
+          {refreshing ? "Refreshing…" : "Refresh Intelligence"}
+        </button>
+      </div>
 
       <AccountHeader account={account} />
+
+      {live && account.scoreBreakdown && (
+        <div className="mt-4">
+          <ScoreBreakdown breakdown={account.scoreBreakdown} />
+        </div>
+      )}
 
       {/* Section 1 — Account Overview */}
       <section className="mt-8">
         <SectionTitle index="01" title="Account Overview" />
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
           <div className="flex items-center gap-2 mb-4">
-            <EvidenceBadge type="DEMO" />
-            <span className="text-xs text-slate-400">Organisation data is illustrative — to be replaced with verified research.</span>
+            {live ? <EvidenceBadge type="FACT" label="LIVE RESEARCHED" /> : <EvidenceBadge type="DEMO" />}
+            <span className="text-xs text-slate-400">
+              {live ? "Sourced from public web research — verify specifics in discovery." : "Organisation data is illustrative — to be replaced with verified research."}
+            </span>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             <OverviewField label="Organisation" value={account.name} />
@@ -148,7 +191,7 @@ export default function AccountIntelligence() {
         ) : (
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-8 text-center">
             <p className="text-sm text-slate-500">No signals captured yet.</p>
-            <p className="mt-1 text-xs text-slate-400">Signals will appear as researched evidence is added to this account.</p>
+            <p className="mt-1 text-xs text-slate-400">Run "Refresh Intelligence" to research this account, or add signals manually.</p>
           </div>
         )}
       </section>
@@ -168,7 +211,7 @@ export default function AccountIntelligence() {
               <ul className="space-y-1.5 text-sm text-slate-600">
                 <li>• {account.segment} based in {account.headquarters || "the UK"}.</li>
                 <li>• {account.employeeCount ? `${account.employeeCount.toLocaleString()} employees` : "Employee count not established"}.</li>
-                <li>• {fmtAum(account.aum)} AUM (demo / unsourced).</li>
+                <li>• {fmtAum(account.aum)} AUM{live ? "" : " (demo / unsourced)"}.</li>
                 <li>• Primary trigger: {account.primaryTrigger || "not established"}.</li>
               </ul>
             </div>
@@ -242,7 +285,7 @@ export default function AccountIntelligence() {
 
       {/* Section 8 — Generate Account Strategy */}
       <section className="mt-8">
-        <SectionTitle index="08" title="Account Strategy" subtitle="AI-generated thesis, outreach and MEDDPICC — built from stored account data." />
+        <SectionTitle index="08" title="Account Strategy" subtitle="AI-generated thesis, outreach and MEDDPICC — built from the account's researched evidence." />
         {!strategy && (
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-8 text-center">
             <div className="mx-auto h-12 w-12 rounded-xl bg-slate-900 flex items-center justify-center mb-4">
@@ -250,7 +293,7 @@ export default function AccountIntelligence() {
             </div>
             <h3 className="text-sm font-medium text-slate-700">Generate an account strategy</h3>
             <p className="mt-1 text-xs text-slate-400 max-w-md mx-auto mb-5">
-              Produces an account thesis, why-now, entry persona, Flanks wedge, discovery questions, outreach and MEDDPICC from the data stored for this account.
+              Produces an account thesis, why-now, entry persona, Flanks wedge, discovery questions, outreach and MEDDPICC from this account's evidence, signals and score breakdown.
             </p>
             <button
               onClick={handleGenerate}
