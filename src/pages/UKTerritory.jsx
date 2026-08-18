@@ -6,6 +6,9 @@ import PriorityAccountsTable from "@/components/PriorityAccountsTable";
 import PageHeader from "@/components/PageHeader";
 import AnalyseAccountButton from "@/components/AnalyseAccountButton";
 import MultiplierTalkingPoint from "@/components/MultiplierTalkingPoint";
+import DemoCallout from "@/components/intel/DemoCallout";
+import Instructional from "@/components/intel/Instructional";
+import { useDemoMode } from "@/lib/DemoModeContext";
 
 export default function UKTerritory() {
   const [accounts, setAccounts] = useState([]);
@@ -41,6 +44,9 @@ export default function UKTerritory() {
     return list;
   }, [accounts, segment, toggles, sortDesc, gtmMotion]);
 
+  const demo = useDemoMode();
+  const demoAccount = accounts.find((a) => a.isDemoAccount) || null;
+
   const kpis = useMemo(
     () => ({
       total: accounts.length,
@@ -75,13 +81,15 @@ export default function UKTerritory() {
       <div className="mb-5 flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3">
         <div className="h-9 w-9 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center text-sm font-semibold shrink-0">M</div>
         <div>
-          <div className="text-[11px] uppercase tracking-wider text-slate-400">Multiplier Opportunities</div>
+          <div className="text-[11px] uppercase tracking-wider text-slate-400 flex items-center gap-1">Multiplier Opportunities <Instructional id="ecosystem-multiplier" /></div>
           <div className="text-sm font-medium text-slate-700">{loading ? "—" : `${kpis.multiplier} embedded / ecosystem / partner accounts`}</div>
         </div>
         <span className="ml-auto text-xs text-slate-400 hidden sm:block">Distribution value — one platform → many institutions</span>
       </div>
 
       <MultiplierTalkingPoint />
+
+      <DemoCallout demoAccount={demoAccount} />
 
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold tracking-tight text-slate-900">Priority Accounts This Week</h2>
@@ -95,7 +103,7 @@ export default function UKTerritory() {
       {loading ? (
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-10 text-center text-sm text-slate-400">Loading accounts…</div>
       ) : (
-        <PriorityAccountsTable accounts={filtered} sortBy={sortDesc} onSort={() => setSortDesc((s) => !s)} />
+        <PriorityAccountsTable accounts={filtered} sortBy={sortDesc} onSort={() => setSortDesc((s) => !s)} demoActive={!!demo?.active} onOpenDemo={(a) => demo.openDemoAccount(a.id)} />
       )}
     </div>
   );

@@ -1,5 +1,6 @@
 import React from "react";
 import EvidenceBadge from "@/components/intel/EvidenceBadge";
+import Instructional from "@/components/intel/Instructional";
 
 const routeIcons = {
   DIRECT: "Direct",
@@ -11,11 +12,13 @@ const routeIcons = {
 };
 
 export default function RouteCard({ route }) {
-  const hasEvidence = !!(route.routeDescription || route.organisation || route.person);
   return (
     <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold text-slate-900 uppercase tracking-wider">{routeIcons[route.routeType] || route.routeType}</span>
+        <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-900 uppercase tracking-wider">
+          {routeIcons[route.routeType] || route.routeType}
+          <Instructional id="routes" />
+        </span>
         {route.routeStatus === "verified" ? <EvidenceBadge type={route.sourceUrl ? "VERIFIED_FACT" : "GROUNDED_FINDING"} label="IDENTIFIED ROUTE" /> : <EvidenceBadge type="HYPOTHESIS" label="ROUTE TO INVESTIGATE" />}
       </div>
       <p className="mt-3 text-sm text-slate-600 leading-relaxed">{route.routeDescription || "Route to investigate — no evidence of an existing relationship yet."}</p>

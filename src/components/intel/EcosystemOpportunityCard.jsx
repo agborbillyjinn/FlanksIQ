@@ -1,5 +1,6 @@
 import React from "react";
 import EvidenceBadge from "@/components/intel/EvidenceBadge";
+import Instructional from "@/components/intel/Instructional";
 
 const relStyle = {
   COMPLEMENT: "bg-emerald-50 text-emerald-700 ring-emerald-200",
@@ -23,7 +24,10 @@ export default function EcosystemOpportunityCard({ account }) {
   return (
     <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
       <div className="flex items-center gap-2 flex-wrap">
-        <EvidenceBadge type="HYPOTHESIS" label="ECOSYSTEM OPPORTUNITY" />
+        <span className="inline-flex items-center gap-1.5">
+          <EvidenceBadge type="HYPOTHESIS" label="ECOSYSTEM OPPORTUNITY" />
+          <Instructional id="ecosystem-multiplier" />
+        </span>
         <span className={`text-[10px] px-2 py-0.5 rounded-full ring-1 uppercase tracking-wider ${relStyle[rel]}`}>{rel}</span>
         <span className="text-xs text-slate-400">Hypothesis — validate in ecosystem discovery.</span>
       </div>

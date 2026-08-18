@@ -1,4 +1,5 @@
 import React from "react";
+import Instructional from "@/components/intel/Instructional";
 
 const styles = {
   VERIFIED_FACT: "bg-emerald-50 text-emerald-700 border-emerald-200",
@@ -18,11 +19,23 @@ const labels = {
   DEMO: "DEMO DATA",
 };
 
+const instrMap = {
+  VERIFIED_FACT: "badge-verified",
+  FACT: "badge-verified",
+  GROUNDED_FINDING: "badge-grounded",
+  INFERENCE: "badge-grounded",
+  HYPOTHESIS: "badge-hypothesis",
+};
+
 export default function EvidenceBadge({ type, label }) {
   const text = label || labels[type] || "DEMO DATA";
+  const instrId = instrMap[type];
   return (
-    <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full border uppercase tracking-[0.1em] ${styles[type] || styles.DEMO}`}>
-      {text}
+    <span className="inline-flex items-center gap-1">
+      <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full border uppercase tracking-[0.1em] ${styles[type] || styles.DEMO}`}>
+        {text}
+      </span>
+      {instrId && <Instructional id={instrId} />}
     </span>
   );
 }

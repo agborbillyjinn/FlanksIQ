@@ -141,6 +141,12 @@
         "COMPETITOR",
         "UNKNOWN"
       ]
+    },
+    "isDemoAccount": {
+      "type": "boolean"
+    },
+    "demoOrder": {
+      "type": "number"
     }
   },
   "required": [

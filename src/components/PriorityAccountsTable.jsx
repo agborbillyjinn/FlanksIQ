@@ -9,7 +9,7 @@ const tierStyles = {
   "Tier 3": "bg-slate-50 text-slate-400 ring-slate-200",
 };
 
-export default function PriorityAccountsTable({ accounts, sortBy, onSort }) {
+export default function PriorityAccountsTable({ accounts, sortBy, onSort, demoActive, onOpenDemo }) {
   return (
     <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
       <div className="overflow-x-auto">
@@ -35,7 +35,7 @@ export default function PriorityAccountsTable({ accounts, sortBy, onSort }) {
             {accounts.map((a) => {
               const fit = scoreColor(a.priorityScore);
               return (
-                <tr key={a.id} className="hover:bg-slate-50/60 transition-colors">
+                <tr key={a.id} className={`hover:bg-slate-50/60 transition-colors ${a.isDemoAccount ? "bg-sky-50/30" : ""} ${a.isDemoAccount && demoActive ? "ring-2 ring-inset ring-sky-400" : ""}`}>
                   <td className="px-5 py-3.5">
                     <div className="flex items-center gap-3">
                       <div className="h-9 w-9 rounded-lg bg-slate-100 text-slate-500 flex items-center justify-center text-xs font-semibold">
@@ -43,7 +43,11 @@ export default function PriorityAccountsTable({ accounts, sortBy, onSort }) {
                       </div>
                       <div>
                         <div className="font-medium text-slate-900 flex items-center gap-1.5">
-                          <Link to={`/accounts/${a.id}`} className="hover:text-sky-700">{a.name}</Link>
+                          {demoActive && a.isDemoAccount ? (
+                            <button onClick={() => onOpenDemo && onOpenDemo(a)} className="hover:text-sky-700 text-left">{a.name}</button>
+                          ) : (
+                            <Link to={`/accounts/${a.id}`} className="hover:text-sky-700">{a.name}</Link>
+                          )}
                           {a.website && (
                             <a href={a.website} target="_blank" rel="noreferrer">
                               <ExternalLink className="h-3 w-3 text-slate-300 hover:text-slate-500" />
@@ -51,6 +55,11 @@ export default function PriorityAccountsTable({ accounts, sortBy, onSort }) {
                           )}
                         </div>
                         <div className="text-xs text-slate-400">{a.subsegment || a.headquarters}</div>
+                        {a.isDemoAccount && (
+                          <div className={`mt-0.5 text-[10px] uppercase tracking-wider ${demoActive ? "text-sky-700" : "text-slate-400"}`}>
+                            <span className={demoActive ? "animate-pulse" : ""}>★</span> Interview Demo — recommended walkthrough account
+                          </div>
+                        )}
                       </div>
                     </div>
                   </td>

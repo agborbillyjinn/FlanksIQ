@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useDemoMode } from "@/lib/DemoModeContext";
 import { presentSteps } from "@/components/intel/presentSteps";
-import { ChevronDown, ChevronLeft, ChevronRight, X, Minus } from "lucide-react";
+import DemoHelp from "@/components/intel/DemoHelp";
+import { ChevronDown, ChevronLeft, ChevronRight, X, Minus, HelpCircle } from "lucide-react";
 
 export default function PresenterGuide() {
   const demo = useDemoMode();
   const [sayOpen, setSayOpen] = useState(true);
   const [minimised, setMinimised] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
 
   useEffect(() => { setSayOpen(true); }, [demo?.step]);
 
@@ -20,10 +22,7 @@ export default function PresenterGuide() {
   if (minimised) {
     return (
       <div className="fixed bottom-6 right-6 z-40">
-        <button
-          onClick={() => setMinimised(false)}
-          className="flex items-center gap-2 px-3 py-2 rounded-full bg-slate-900 text-white text-xs shadow-lg hover:bg-slate-800"
-        >
+        <button onClick={() => setMinimised(false)} className="flex items-center gap-2 px-3 py-2 rounded-full bg-slate-900 text-white text-xs shadow-lg hover:bg-slate-800">
           <span className="h-1.5 w-1.5 rounded-full bg-sky-400 animate-pulse" />
           Demo Guide · Step {demo.step + 1}/{total}
         </button>
@@ -32,7 +31,7 @@ export default function PresenterGuide() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-40 w-[320px] max-w-[calc(100vw-2rem)]">
+    <div className="fixed bottom-6 right-6 z-40 w-[336px] max-w-[calc(100vw-2rem)]">
       <div className="rounded-2xl border border-slate-700 bg-[#0b1220] text-slate-200 shadow-2xl overflow-hidden">
         <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/10">
           <div className="flex items-center gap-2">
@@ -40,22 +39,49 @@ export default function PresenterGuide() {
             <span className="text-[11px] text-slate-400">Step {demo.step + 1} of {total}</span>
           </div>
           <div className="flex items-center gap-1">
+            <button onClick={() => setHelpOpen(true)} title="Demo Help" className="p-1 rounded text-slate-400 hover:text-white hover:bg-white/10"><HelpCircle className="h-3.5 w-3.5" /></button>
             <button onClick={() => setMinimised(true)} className="p-1 rounded text-slate-400 hover:text-white hover:bg-white/10"><Minus className="h-3.5 w-3.5" /></button>
             <button onClick={demo.exit} className="p-1 rounded text-slate-400 hover:text-white hover:bg-white/10"><X className="h-3.5 w-3.5" /></button>
           </div>
         </div>
 
-        <div className="px-4 py-3">
+        <div className="px-4 py-3 max-h-[58vh] overflow-y-auto">
           <h3 className="text-sm font-semibold text-white">{step.title}</h3>
+
+          {step.objective && (
+            <div className="mt-2">
+              <div className="text-[10px] uppercase tracking-wider text-slate-400">Objective</div>
+              <p className="mt-0.5 text-xs text-slate-300 leading-relaxed">{step.objective}</p>
+            </div>
+          )}
 
           <div className="mt-2">
             <button onClick={() => setSayOpen((o) => !o)} className="flex items-center gap-1 text-[11px] uppercase tracking-wider text-sky-300 hover:text-sky-200">
               Say this <ChevronDown className={`h-3 w-3 transition-transform ${sayOpen ? "rotate-180" : ""}`} />
             </button>
-            {sayOpen && (
-              <p className="mt-1.5 text-xs text-slate-300 leading-relaxed whitespace-pre-line">{step.say}</p>
-            )}
+            {sayOpen && <p className="mt-1.5 text-xs text-slate-300 leading-relaxed whitespace-pre-line">{step.say}</p>}
           </div>
+
+          {step.doNotSay && (
+            <div className="mt-2 rounded-lg bg-rose-500/10 border border-rose-400/20 px-3 py-2">
+              <div className="text-[10px] uppercase tracking-wider text-rose-300">Do not say</div>
+              <p className="mt-0.5 text-[11px] text-rose-200 leading-relaxed">{step.doNotSay}</p>
+            </div>
+          )}
+
+          {step.recommendedInteraction && (
+            <div className="mt-2">
+              <div className="text-[10px] uppercase tracking-wider text-slate-400">Recommended interaction</div>
+              <p className="mt-0.5 text-xs text-slate-300 leading-relaxed">{step.recommendedInteraction}</p>
+            </div>
+          )}
+
+          {step.nextInteraction && (
+            <div className="mt-2">
+              <div className="text-[10px] uppercase tracking-wider text-slate-400">Next interaction</div>
+              <p className="mt-0.5 text-xs text-slate-300 leading-relaxed">{step.nextInteraction}</p>
+            </div>
+          )}
 
           <div className="mt-3 rounded-lg bg-white/5 border border-white/10 px-3 py-2">
             <div className="text-[10px] uppercase tracking-wider text-slate-400">Presenter note</div>
@@ -73,6 +99,8 @@ export default function PresenterGuide() {
           </button>
         </div>
       </div>
+
+      {helpOpen && <DemoHelp onClose={() => setHelpOpen(false)} />}
     </div>
   );
 }

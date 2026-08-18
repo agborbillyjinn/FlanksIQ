@@ -1,11 +1,15 @@
 import React from "react";
 import EvidenceBadge from "@/components/intel/EvidenceBadge";
+import Instructional from "@/components/intel/Instructional";
 
 export default function PainHypothesisCard({ hypothesis }) {
   return (
     <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
       <div className="flex items-center justify-between">
-        <EvidenceBadge type="HYPOTHESIS" label="HYPOTHESIS — VALIDATE" />
+        <span className="inline-flex items-center gap-1.5">
+          <EvidenceBadge type="HYPOTHESIS" label="HYPOTHESIS — VALIDATE" />
+          <Instructional id="pain-hypothesis" />
+        </span>
         {hypothesis.confidence != null && <span className="text-xs text-slate-400">Confidence {hypothesis.confidence}/100</span>}
       </div>
       <h3 className="mt-3 text-sm font-semibold text-slate-900">{hypothesis.hypothesis}</h3>

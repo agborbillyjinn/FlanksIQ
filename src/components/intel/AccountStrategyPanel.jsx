@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import EvidenceBadge from "@/components/intel/EvidenceBadge";
 import Collapsible from "@/components/intel/Collapsible";
+import Instructional from "@/components/intel/Instructional";
+import { useDemoMode } from "@/lib/DemoModeContext";
 
 function Field({ label, value }) {
   return (
@@ -14,6 +16,8 @@ function Field({ label, value }) {
 export default function AccountStrategyPanel({ strategy }) {
   const [tab, setTab] = useState("email");
   const s = strategy;
+  const demo = useDemoMode();
+  const demoActive = !!demo?.active;
 
   return (
     <div className="space-y-5">
@@ -23,7 +27,7 @@ export default function AccountStrategyPanel({ strategy }) {
           <span className="text-xs text-slate-400">Generated {s.generatedAt ? new Date(s.generatedAt).toLocaleDateString("en-GB") : ""}</span>
         </div>
         <div className="rounded-lg border border-slate-200 p-4 bg-slate-50/50">
-          <div className="text-[11px] text-slate-400 uppercase tracking-wider">Account Thesis</div>
+          <div className="text-[11px] text-slate-400 uppercase tracking-wider flex items-center gap-1">Account Thesis <Instructional id="strategy-fields" /></div>
           <p className="mt-1 text-sm text-slate-800 leading-relaxed">{s.accountThesis}</p>
         </div>
         <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -38,10 +42,10 @@ export default function AccountStrategyPanel({ strategy }) {
       </div>
 
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
-        <h3 className="text-sm font-semibold text-slate-900 mb-3">Discovery Questions</h3>
+        <h3 className="text-sm font-semibold text-slate-900 mb-3 flex items-center gap-1.5">Discovery Questions <Instructional id="discovery-questions" /></h3>
         <ol className="space-y-2">
           {(s.discoveryQuestions || []).map((q, i) => (
-            <li key={i} className="flex gap-3 text-sm text-slate-700">
+            <li key={i} className={`flex gap-3 text-sm rounded-lg px-2 py-1 ${i < 2 && demoActive ? "bg-sky-50/60 border border-sky-100 text-slate-800" : "text-slate-700"}`}>
               <span className="text-slate-400 tabular-nums shrink-0">{i + 1}.</span>
               <span>{q}</span>
             </li>
@@ -70,7 +74,7 @@ export default function AccountStrategyPanel({ strategy }) {
       </Collapsible>
 
       <div id="next-action" className="rounded-xl border border-slate-900 bg-slate-900 p-5 scroll-mt-32">
-        <div className="text-[11px] text-slate-300 uppercase tracking-wider">Recommended Next Action</div>
+        <div className="text-[11px] text-slate-300 uppercase tracking-wider flex items-center gap-1">Recommended Next Action <Instructional id="next-action" /></div>
         <p className="mt-1 text-sm text-white font-medium leading-relaxed">{s.nextAction}</p>
       </div>
     </div>

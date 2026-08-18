@@ -13,6 +13,7 @@ import AccountStrategyPanel from "@/components/intel/AccountStrategyPanel";
 import MeddpiccPanel from "@/components/intel/MeddpiccPanel";
 import EcosystemOpportunityCard from "@/components/intel/EcosystemOpportunityCard";
 import MultiplierAssessmentCard from "@/components/intel/MultiplierAssessmentCard";
+import Instructional from "@/components/intel/Instructional";
 import PresentStartModal from "@/components/intel/PresentStartModal";
 import ScoreBreakdown from "@/components/intel/ScoreBreakdown";
 import EvidenceBadge from "@/components/intel/EvidenceBadge";
@@ -194,7 +195,7 @@ export default function AccountIntelligence() {
 
       {account.gtmMotion && account.gtmMotion !== "Direct" && (
         <section id="ecosystem" className="mt-8 scroll-mt-32">
-          <SectionTitle title="Ecosystem Opportunity" subtitle="Distribution value — one platform or partner could create access to many institutions." />
+          <SectionTitle title="Ecosystem Opportunity" subtitle="Distribution value — one platform or partner could create access to many institutions." instructionalId="ecosystem-multiplier" />
           <div className="space-y-4">
             <MultiplierAssessmentCard account={account} />
             <EcosystemOpportunityCard account={account} />
@@ -204,7 +205,7 @@ export default function AccountIntelligence() {
 
       {/* 02 — Why Now */}
       <section id="why-now" className="mt-8 scroll-mt-32">
-        <SectionTitle index="02" title="Why Now" subtitle="Evidence-backed signals that may create a reason to engage." />
+        <SectionTitle index="02" title="Why Now" subtitle="Evidence-backed signals that may create a reason to engage." instructionalId="section-why-now" />
         {signals.length ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {signals.map((s) => <SignalCard key={s.id} signal={s} />)}
@@ -219,7 +220,7 @@ export default function AccountIntelligence() {
 
       {/* 03/04 — Hypotheses (Thesis + Pain Hypotheses) */}
       <section id="hypotheses" className="mt-8 scroll-mt-32">
-        <SectionTitle index="03" title="Opportunity Thesis" />
+        <SectionTitle index="03" title="Opportunity Thesis" instructionalId="section-thesis" />
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-5">
           <div className="flex items-center gap-2">
             <EvidenceBadge type="HYPOTHESIS" />
@@ -265,7 +266,7 @@ export default function AccountIntelligence() {
 
       {/* 05 — Flanks Solution Mapping */}
       <section id="solution" className="mt-8 scroll-mt-32">
-        <SectionTitle index="05" title="Flanks Solution Mapping" subtitle="The likely Flanks proposition to test through discovery." />
+        <SectionTitle index="05" title="Flanks Solution Mapping" subtitle="The likely Flanks proposition to test through discovery." instructionalId="section-solution" />
         <SolutionJourney
           wedge={strategy?.flanksWedge}
           whyRelevant={account.highDataComplexity ? "Hypothesised fit with the account's wealth-data complexity." : null}
@@ -315,14 +316,17 @@ export default function AccountIntelligence() {
             <p className="mt-1 text-xs text-slate-400 max-w-md mx-auto mb-5">
               Produces an account thesis, why-now, entry persona, Flanks wedge, discovery questions, outreach and MEDDPICC from this account's evidence, signals and score breakdown.
             </p>
-            <button
-              onClick={handleGenerate}
-              disabled={generating}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-slate-900 text-white text-sm font-medium hover:bg-slate-800 disabled:opacity-60 transition-colors"
-            >
-              {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-              {generating ? "Generating…" : "Generate Account Strategy"}
-            </button>
+            <div className="inline-flex items-center gap-2">
+              <button
+                onClick={handleGenerate}
+                disabled={generating}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-slate-900 text-white text-sm font-medium hover:bg-slate-800 disabled:opacity-60 transition-colors"
+              >
+                {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                {generating ? "Generating…" : "Generate Account Strategy"}
+              </button>
+              <Instructional id="generate-strategy" />
+            </div>
             {error && <p className="mt-3 text-xs text-rose-600">{error}</p>}
           </div>
         )}

@@ -61,12 +61,17 @@ export function DemoModeProvider({ children }) {
     if (fromDashboard && location.pathname !== "/") navigate("/");
   }, [location.pathname, navigate]);
 
+  const openDemoAccount = useCallback((accId) => {
+    setAccountId(accId);
+    setStep(1);
+  }, []);
+
   const exit = useCallback(() => { setActive(false); setStep(0); }, []);
   const next = useCallback(() => setStep((c) => Math.min(c + 1, presentSteps.length - 1)), []);
   const prev = useCallback(() => setStep((c) => Math.max(c - 1, 0)), []);
 
   return (
-    <DemoModeContext.Provider value={{ active, step, accountId, start, exit, next, prev }}>
+    <DemoModeContext.Provider value={{ active, step, accountId, start, exit, next, prev, openDemoAccount }}>
       {children}
     </DemoModeContext.Provider>
   );

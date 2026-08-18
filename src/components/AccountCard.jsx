@@ -5,7 +5,7 @@ import ScoreIndicator from "@/components/ScoreIndicator";
 export default function AccountCard({ account }) {
   const a = account;
   return (
-    <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 hover:shadow-md transition-shadow">
+    <div className={`bg-white rounded-xl border shadow-sm p-5 hover:shadow-md transition-shadow ${a.isDemoAccount ? "border-sky-300 ring-1 ring-sky-200" : "border-slate-200"}`}>
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 rounded-lg bg-slate-100 text-slate-500 flex items-center justify-center text-sm font-semibold">
@@ -14,6 +14,7 @@ export default function AccountCard({ account }) {
           <div>
             <Link to={`/accounts/${a.id}`} className="font-semibold text-slate-900 hover:text-sky-700">{a.name}</Link>
             <div className="text-xs text-slate-400">{a.segment}</div>
+            {a.isDemoAccount && <div className="mt-0.5 text-[10px] uppercase tracking-wider text-sky-700">★ Interview Demo</div>}
           </div>
         </div>
         <span className="text-[10px] px-2 py-0.5 rounded-full ring-1 ring-slate-200 text-slate-500">{a.tier}</span>

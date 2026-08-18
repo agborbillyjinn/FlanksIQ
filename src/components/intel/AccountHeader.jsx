@@ -1,6 +1,7 @@
 import React from "react";
 import ScoreCard from "@/components/intel/ScoreCard";
 import { ExternalLink, MapPin, RefreshCw, Sparkles, Loader2, Play } from "lucide-react";
+import Instructional from "@/components/intel/Instructional";
 
 export default function AccountHeader({ account, onRefresh, onGenerate, onPresent, refreshing, generating, strategy }) {
   const live = account.dataSource === "live";
@@ -42,11 +43,11 @@ export default function AccountHeader({ account, onRefresh, onGenerate, onPresen
       </div>
 
       <div className="mt-6 grid grid-cols-2 md:grid-cols-5 gap-3">
-        <ScoreCard label="Flanks Fit" score={account.flanksFitScore} />
-        <ScoreCard label="Timing" score={account.timingScore} />
-        <ScoreCard label="Access" score={account.accessScore} />
-        <ScoreCard label="Evidence" score={account.evidenceConfidence} />
-        <ScoreCard label="Priority" score={account.priorityScore} emphasis />
+        <ScoreCard label="Flanks Fit" score={account.flanksFitScore} instructionalId="score-flanksFit" />
+        <ScoreCard label="Timing" score={account.timingScore} instructionalId="score-timing" />
+        <ScoreCard label="Access" score={account.accessScore} instructionalId="score-access" />
+        <ScoreCard label="Evidence" score={account.evidenceConfidence} instructionalId="score-evidence" />
+        <ScoreCard label="Priority" score={account.priorityScore} emphasis instructionalId="score-priority" />
       </div>
       <p className="mt-3 text-xs text-slate-400 max-w-2xl">
         Priority combines structural fit, timing, route-to-account and evidence confidence to help focus AE attention. This is a sales prioritisation framework, not a scientifically validated model.
@@ -60,14 +61,17 @@ export default function AccountHeader({ account, onRefresh, onGenerate, onPresen
           {refreshing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
           {refreshing ? "Refreshing…" : "Refresh Research"}
         </button>
-        <button
-          onClick={onGenerate}
-          disabled={generating}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 text-xs hover:border-slate-300 hover:text-slate-900 disabled:opacity-60 transition-colors"
-        >
-          {generating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
-          {generating ? "Generating…" : strategy ? "Regenerate Strategy" : "Generate Strategy"}
-        </button>
+        <span className="inline-flex items-center gap-1">
+          <button
+            onClick={onGenerate}
+            disabled={generating}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-600 text-xs hover:border-slate-300 hover:text-slate-900 disabled:opacity-60 transition-colors"
+          >
+            {generating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+            {generating ? "Generating…" : strategy ? "Regenerate Strategy" : "Generate Strategy"}
+          </button>
+          <Instructional id="generate-strategy" />
+        </span>
         <button
           onClick={onPresent}
           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs hover:bg-slate-800 transition-colors ml-auto"

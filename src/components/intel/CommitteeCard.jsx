@@ -1,5 +1,6 @@
 import React from "react";
 import EvidenceBadge from "@/components/intel/EvidenceBadge";
+import Instructional from "@/components/intel/Instructional";
 import { Linkedin } from "lucide-react";
 
 const roleLabels = {
@@ -17,7 +18,10 @@ export default function CommitteeCard({ member }) {
   return (
     <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold text-slate-900 uppercase tracking-wider">{roleLabels[member.roleType] || member.roleType}</span>
+        <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-900 uppercase tracking-wider">
+          {roleLabels[member.roleType] || member.roleType}
+          <Instructional id="buying-committee" />
+        </span>
         {identified ? <EvidenceBadge type={member.sourceUrl ? "VERIFIED_FACT" : "GROUNDED_FINDING"} /> : <EvidenceBadge type="HYPOTHESIS" label="PERSONA" />}
       </div>
       <div className="mt-3 flex items-start gap-3">

@@ -1,5 +1,6 @@
 import React from "react";
 import EvidenceBadge from "@/components/intel/EvidenceBadge";
+import Instructional from "@/components/intel/Instructional";
 
 const meddpiccRows = [
   { key: "metrics", label: "Metrics" },
@@ -18,7 +19,7 @@ export default function MeddpiccPanel({ strategy }) {
     <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
       <div className="flex items-center gap-2 mb-4 flex-wrap">
         <EvidenceBadge type="HYPOTHESIS" label="AI-GENERATED" />
-        <h3 className="text-sm font-semibold text-slate-900">MEDDPICC</h3>
+        <h3 className="text-sm font-semibold text-slate-900 flex items-center gap-1.5">MEDDPICC <Instructional id="meddpicc" /></h3>
         <span className="text-xs text-slate-400">Known · Hypothesised · Unknown</span>
       </div>
       <div className="overflow-x-auto">
@@ -39,7 +40,7 @@ export default function MeddpiccPanel({ strategy }) {
                   <td className="py-3 pr-4 font-medium text-slate-700 align-top">{r.label}</td>
                   <td className="py-3 pr-4 text-slate-600 align-top">{cell.known || "—"}</td>
                   <td className="py-3 pr-4 text-slate-600 align-top">{cell.hypothesised || "—"}</td>
-                  <td className="py-3 text-slate-500 align-top">{cell.unknown || "—"}</td>
+                  <td className={`py-3 align-top ${cell.unknown && cell.unknown !== "—" ? "bg-amber-50/50 text-amber-700" : "text-slate-500"}`}>{cell.unknown || "—"}</td>
                 </tr>
               );
             })}

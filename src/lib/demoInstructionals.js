@@ -1,0 +1,120 @@
+export const instructionals = {
+  "score-flanksFit": {
+    title: "Flanks Fit",
+    what: "Structural attractiveness of the account to Flanks.",
+    why: "A company can be an excellent ICP even without an immediate buying trigger.",
+    say: "Fit tells me whether this structurally looks like an attractive Flanks account.",
+    dontSay: "The AI decided this company is an 87. Explain that the score comes from explicit criteria.",
+  },
+  "score-timing": {
+    title: "Timing",
+    what: "Strength of current observable buying signals.",
+    say: "Timing asks whether there is a reason for me to engage now rather than six months from now.",
+  },
+  "score-access": {
+    title: "Access",
+    what: "How identifiable and reachable the likely buying committee and ecosystem routes are.",
+    say: "An attractive account isn't enough — I also want to understand how I can realistically break into it.",
+  },
+  "score-evidence": {
+    title: "Evidence",
+    what: "Confidence in the public information underpinning the account thesis.",
+    say: "I deliberately score evidence separately because I don't want AI confidence being mistaken for factual confidence.",
+    nextAction: "If the score is relatively low: a lower score isn't necessarily bad — it tells me which assumptions need validating through discovery.",
+  },
+  "score-priority": {
+    title: "Opportunity Priority",
+    what: "Current AE prioritisation score.",
+    say: "This is the number I care about for territory allocation. Fit tells me whether I want the account; Priority helps tell me whether I should spend time on it now.",
+  },
+  "badge-verified": {
+    title: "Verified Fact",
+    what: "Supported by identifiable public evidence.",
+  },
+  "badge-grounded": {
+    title: "Grounded Finding",
+    what: "Returned through live internet-grounded research, but source provenance may be incomplete.",
+  },
+  "badge-hypothesis": {
+    title: "Hypothesis — Validate",
+    what: "Sales interpretation requiring customer discovery.",
+    say: "This distinction is deliberate. AI can accelerate research, but I don't want a salesperson walking into a meeting treating an inference as something the customer actually told us.",
+  },
+  "section-why-now": {
+    title: "Why Now",
+    what: "Observable signals that may create a reason to engage.",
+    say: "I don't want to prospect purely because an organisation matches the ICP. I'm looking for a commercial reason to engage now.",
+    nextAction: "Select one strong signal and explain its commercial relevance. Do not read every signal. Signals can include AI, data transformation, technology modernisation, leadership change, hiring, M&A, expansion, Salesforce, new products.",
+  },
+  "section-thesis": {
+    title: "Opportunity Thesis",
+    what: "The initial sales interpretation of the researched evidence.",
+    say: "This isn't presented as customer truth. It's my initial account thesis based on what we can observe publicly.",
+    nextAction: "Point to What We Know versus What We Need To Validate.",
+  },
+  "pain-hypothesis": {
+    title: "Pain Hypothesis",
+    what: "Potential customer problem inferred from evidence.",
+    say: "This is where I deliberately don't want the AI pretending it knows the customer's pain. The hypothesis gives me something intelligent to validate in discovery.",
+    nextAction: "Open one Pain Hypothesis and read its Discovery Question rather than explaining the entire hypothesis. Highlight its Reason, Confidence and Discovery Question.",
+  },
+  "section-solution": {
+    title: "Flanks Solution Mapping",
+    what: "Possible Flanks proposition based on the hypothesis. Sources / custodians → Aggregate → unified wealth data → Lume → enrichment / reconciliation → CRM / Reporting / Advisory / AI.",
+    say: "I'm not using the research to prescribe a product before discovery. I'm using it to identify the most plausible initial Flanks wedge.",
+    nextAction: "If Aggregate is shown: Aggregate could be the initial data-connectivity layer. If Lume is shown: Lume potentially becomes relevant where enrichment and reconciliation are part of the problem.",
+  },
+  "buying-committee": {
+    title: "Buying Committee",
+    what: "Likely people / personas involved in an enterprise buying process.",
+    say: "I'm mapping both the business and technical buying committee rather than relying on a single contact. Economic Buyer, Champion, Technical Buyer, Users, Risk, Commercial.",
+    nextAction: "If an actual person is shown: that individual was identified from public research. If only a persona is shown: this is a likely persona to investigate — not a claimed stakeholder.",
+  },
+  "routes": {
+    title: "Routes Into Account",
+    what: "Potential ways to access the account. Direct, Salesforce, Partner, Technology, Event, Existing Relationship.",
+    say: "I don't think account development should automatically mean cold-emailing someone. I want the highest-probability route into the account. My ecosystem background means I'd look for technology, partner and co-sell routes alongside direct outbound.",
+    nextAction: "ROUTE TO INVESTIGATE — do not present this as an existing relationship. IDENTIFIED ROUTE — public evidence supports this route.",
+  },
+  "generate-strategy": {
+    title: "Generate Strategy",
+    what: "Turns researched account intelligence into an executable AE plan.",
+    say: "The research only matters if it changes what I actually do next.",
+    nextAction: "DEMO RECOMMENDATION: use the existing generated strategy — avoid unnecessary latency during the interview. Allow Regenerate Strategy only if you deliberately choose it.",
+  },
+  "strategy-fields": {
+    title: "Account Strategy",
+    what: "Account Thesis, Primary Pain, Entry Persona, Commercial Trigger, Flanks Wedge, Relationship Route.",
+    say: "This turns research into a point of view on how I'd actually pursue the account.",
+    nextAction: "Do not read every field.",
+  },
+  "discovery-questions": {
+    title: "Discovery Questions",
+    what: "Questions designed to validate the account thesis.",
+    say: "This is probably the most important output. The AI hasn't proven the pain — it's helped me arrive at better questions faster.",
+    nextAction: "Choose one or two strong questions to show. The recommended two are highlighted automatically.",
+  },
+  "meddpicc": {
+    title: "MEDDPICC",
+    what: "Initial qualification framework. This is NOT completed MEDDPICC. Public research can populate some initial context, but much of MEDDPICC must remain UNKNOWN before discovery.",
+    say: "I would be very suspicious if AI claimed to complete MEDDPICC before I'd even spoken to the customer. The useful output here is actually the unknowns — they tell me what I need to discover.",
+    nextAction: "Highlight UNKNOWN fields as useful discovery gaps rather than failures.",
+  },
+  "next-action": {
+    title: "Recommended Next Action",
+    what: "The specific AE action that follows the analysis.",
+    say: "This is ultimately what I want the workflow to produce — not more research, but a decision about what I should actually do next. The objective isn't to replace sales judgement with AI. It's to improve the speed and quality of my execution.",
+  },
+  "analyse-new-account": {
+    title: "Analyse New Account",
+    what: "Runs the live internet-grounded account research workflow against a new institution.",
+    dontSay: "DO NOT USE DURING THE PREPARED WALKTHROUGH. Show it only after completing the prepared demo.",
+    nextAction: "Suggested line: this isn't actually a static dataset — if you give me another UK institution, I can run the same initial analysis against it. Then WAIT for the interviewer to ask. If they ask, use it. If they do not, do not run it.",
+  },
+  "ecosystem-multiplier": {
+    title: "Ecosystem / Multiplier",
+    what: "Tests accounts that may create distribution value rather than only direct customer value.",
+    say: "I've also started testing whether every attractive account necessarily needs to be an end customer. Salesforce is the easiest example. The question is whether one integration or ecosystem relationship could create access to multiple downstream wealth institutions.",
+    nextAction: "OPTIONAL DISCUSSION. Ask: is that already part of how you're thinking about UK GTM, or is the current priority much more direct? Do not make this part of the mandatory walkthrough.",
+  },
+};
