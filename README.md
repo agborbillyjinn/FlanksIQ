@@ -18,9 +18,7 @@ The result is not simply more account research. It is an **actionable enterprise
 
 **Built as a personal GTM execution system—not as an official Flanks product.**
 
-
-
-# Base44 Project
+# Project
 
 Use this repository to run and edit the app locally, then publish changes back through Base44.
 
