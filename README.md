@@ -1,3 +1,25 @@
+#  ### FlanksIQ — AI-Powered UK Territory & Account Intelligence
+
+**FlanksIQ** is an AI-powered territory and account intelligence platform built to demonstrate how I would approach building and executing Flanks' UK go-to-market strategy.
+
+It transforms live public-web research into an evidence-led enterprise sales workflow:
+
+**Account Universe → ICP Qualification → Live Research → Buying Signals → Flanks Fit → Why Now → Opportunity Priority → Pain Hypotheses → Buying Committee → Routes Into Account → Account Strategy → Discovery → MEDDPICC → Next Action**
+
+Rather than allowing AI to present assumptions as facts, FlanksIQ separates **verified facts, grounded findings and hypotheses requiring discovery**, following the principle:
+
+> **AI proposes. Evidence proves. Sales validates.**
+
+Accounts are prioritised across **structural fit, timing, accessibility and evidence confidence**, helping distinguish a great-fit account from one that actually deserves sales attention now.
+
+FlanksIQ also models **ecosystem and multiplier opportunities**—such as WealthTech platforms, CRMs, technology partners and SIs—where one integration or partnership could potentially provide access to multiple downstream wealth institutions.
+
+The result is not simply more account research. It is an **actionable enterprise sales strategy** showing why to pursue an account, who to engage, how to get in, what hypotheses to validate, which Flanks capability may provide the initial wedge, and what the seller should do next.
+
+**Built as a personal GTM execution system—not as an official Flanks product.**
+
+
+
 # Base44 Project
 
 Use this repository to run and edit the app locally, then publish changes back through Base44.
